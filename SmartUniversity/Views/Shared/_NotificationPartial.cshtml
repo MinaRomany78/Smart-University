@@ -1,0 +1,23 @@
+﻿<script>
+    $(function () {
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right",
+            "timeOut": "4000"
+        };
+
+        @if (TempData["success-notification"] != null)
+        {
+                <text>toastr.success('@TempData["success-notification"]');</text>
+        }
+        @if (TempData["error-notification"] != null)
+        {
+                <text>toastr.error('@TempData["error-notification"]');</text>
+        }
+        @if (TempData["info-notification"] != null)
+        {
+                <text>toastr.info('@TempData["info-notification"]');</text>
+        }
+    });
+</script>

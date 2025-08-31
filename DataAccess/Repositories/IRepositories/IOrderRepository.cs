@@ -1,0 +1,9 @@
+﻿using Entities.Models;
+
+namespace DataAccess.Repositories.IRepositories
+{
+    public interface IOrderRepository : IRepository<Order>
+    {
+
+    }
+}

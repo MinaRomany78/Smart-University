@@ -1,0 +1,168 @@
+﻿@model IEnumerable<Entities.Models.Student>
+@{
+    ViewData["Title"] = "Manage University Students";
+}
+
+<style>
+    .dashboard-table {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    }
+
+        .dashboard-table thead {
+            background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .dashboard-table tbody tr {
+            transition: all 0.2s ease-in-out;
+        }
+
+            .dashboard-table tbody tr:hover {
+                background-color: #f8f9fa;
+                transform: scale(1.01);
+            }
+
+        .dashboard-table td,
+        .dashboard-table th {
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+
+    .table-actions .btn {
+        border-radius: 8px;
+        padding: 6px 10px;
+    }
+
+    .search-box {
+        margin-bottom: 16px;
+        max-width: 300px;
+    }
+</style>
+
+<div class="mt-3">
+    @* <div class="d-flex justify-content-between align-items-center mb-3">
+        <input id="studentSearch" type="text" class="form-control search-box" placeholder="🔍 Search students..." />
+        <a href="@Url.Action("Create", "UniversityStudent", new { area = "Admin" })" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Student
+        </a>
+    </div> *@
+
+    <div class="table-responsive dashboard-table">
+        <table class="table align-middle text-center mb-0" id="studentTable">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>UserName</th>
+                    <th>Email</th>
+                    <th>National ID</th>
+                    <th>Department</th>
+                    <th>Term</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@student.ApplicationUser.FullName</td>
+                        <td>@student.ApplicationUser.UserName</td>
+                        <td>@student.ApplicationUser.Email</td>
+                        <td>@student.NationalID</td>
+                        <td>@student.Department?.Name</td>
+                        <td>@student.Term?.Name</td>
+                        <td class="table-actions">
+                            <a href="@Url.Action("Edit", "UniversityStudent", new { id = student.Id, area = "Admin" })"
+                               class="btn btn-warning btn-sm me-1" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="#"
+                               data-delete-url="@Url.Action("Delete", "UniversityStudent", new { id = student.Id, area = "Admin" })"
+                               class="btn btn-danger btn-sm btn-delete" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* Pagination *@
+    <nav aria-label="Students pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= (int)ViewBag.totalPages; i++)
+            {
+                <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "UniversityStudent", new { area = "Admin", page = i })">
+                        @i
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(function () {
+            @* Success Message *@
+            @if (TempData["success-notification"] != null)
+            {
+                    <text>
+                        toastr.success('@TempData["success-notification"]');
+                    </text>
+            }
+
+            @* Error Message *@
+            @if (TempData["error-notification"] != null)
+            {
+                    <text>
+                        toastr.error('@TempData["error-notification"]');
+                    </text>
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Search filter
+            const searchInput = document.getElementById('studentSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function () {
+                    const searchText = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#studentTable tbody tr');
+                    rows.forEach(row => {
+                        row.style.display = row.textContent.toLowerCase().includes(searchText) ? '' : 'none';
+                    });
+                });
+            }
+
+            // Delete confirmation
+            document.addEventListener("click", function (e) {
+                const target = e.target.closest(".btn-delete");
+                if (!target) return;
+
+                e.preventDefault();
+                const deleteUrl = target.getAttribute("data-delete-url");
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This student will be permanently deleted!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = deleteUrl;
+                    }
+                });
+            });
+        });
+    </script>
+}

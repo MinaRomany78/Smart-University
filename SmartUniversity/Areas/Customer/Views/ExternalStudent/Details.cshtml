@@ -1,0 +1,330 @@
+﻿@using Entities.ViewModel
+@model OcoursesWithTopANDReviewsVM
+
+@{
+    ViewData["Title"] = Model.OptionalCourse.Name;
+    Layout = "_Layout";
+}
+
+<!-- Course Details Section -->
+<div class="container py-5">
+    <div class="row g-5 align-items-center">
+        <!-- Course Image -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <img src="~/images/@Model.OptionalCourse.MainImg"
+                     alt="@Model.OptionalCourse.Name"
+                     class="img-fluid w-100" style="max-height:400px; object-fit:cover;" />
+            </div>
+        </div>
+
+        <!-- Course Info -->
+        <div class="col-lg-6 d-flex flex-column">
+            <h1 class="fw-bold mb-3 text-gradient">@Model.OptionalCourse.Name</h1>
+
+            <p class="text-secondary mb-3 d-flex align-items-center gap-2">
+                <i class="fas fa-user-tie fs-5"></i>
+                <span>Instructor: <strong>@Model.OptionalCourse.Instructor?.ApplicationUser?.FullName</strong></span>
+            </p>
+
+            <p class="text-secondary mb-3 d-flex align-items-center gap-2">
+                <i class="fas fa-sticky-note fs-5"></i>
+                <span>@Model.OptionalCourse.Description</span>
+            </p>
+
+            <p class="text-success mb-4 d-flex align-items-center gap-2">
+                <i class="fas fa-dollar-sign fs-5"></i>
+                <span>Price: <strong>@Model.OptionalCourse.Price.ToString("C")</strong></span>
+            </p>
+
+            <!-- Promo Code + Buttons -->
+            <div class="mt-auto">
+                <form asp-area="Customer" asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex flex-column gap-3">
+                    <input type="hidden" name="id" value="@Model.OptionalCourse.Id" />
+
+                    <!-- Promo Code -->
+                    <div>
+                        <label for="PromoCode" class="form-label fw-semibold">Promo Code</label>
+                        <input type="text" name="PromoCode" id="PromoCode" class="form-control rounded-pill shadow-sm" placeholder="Enter promo code..." />
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-gradient flex-grow-1 fw-semibold rounded-pill shadow-sm">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+
+                        <button type="submit" name="actionType" value="buy" class="btn btn-gradient flex-grow-1 fw-semibold rounded-pill shadow-sm">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Average Rating -->
+<div class="container mt-5">
+    <div class="d-flex align-items-center gap-3">
+        <h3 class="fw-bold mb-0 text-warning d-flex align-items-center gap-2">
+            <i class="fas fa-star"></i> @Model.AverageRating.ToString("0.0") / 5
+        </h3>
+        <small class="text-muted">(@Model.Reviews.Count() reviews)</small>
+    </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="container mt-4">
+    <h4 class="mb-4 text-primary fw-semibold">💬 Student Reviews</h4>
+
+    @if (Model.Reviews.Any())
+    {
+        <div class="list-group">
+            @foreach (var review in Model.Reviews)
+            {
+                <div class="list-group-item shadow-sm mb-3 rounded-4 p-4 bg-white border border-light">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-dark">@review.ApplicationUser.FullName</strong>
+                        <span class="text-warning fw-bold d-flex align-items-center gap-1">
+                            <i class="fas fa-star"></i> @review.Rating
+                        </span>
+                    </div>
+                    <p class="mb-2 text-secondary fst-italic">"@review.Comment"</p>
+                    <small class="text-muted">@review.CreatedAt.ToString("MMM dd, yyyy")</small>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted fst-italic">No reviews yet. Be the first to add one! 🚀</p>
+    }
+</div>
+
+<!-- Add Review Form -->
+@if (User.Identity!.IsAuthenticated)
+{
+    <div class="container mt-5">
+        <div class="card shadow-sm p-4 rounded-4 border-light">
+            <h4 class="mb-4 text-primary fw-semibold">Write a Review ✍️</h4>
+            <form asp-action="AddReview" method="post" class="needs-validation" novalidate>
+                <input type="hidden" name="CourseId" value="@Model.OptionalCourse.Id" />
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Rating</label>
+                    <div class="star-rating" role="radiogroup" aria-label="Rating">
+                        <input type="radio" id="star5" name="Rating" value="5" required />
+                        <label for="star5" title="5 stars">★</label>
+
+                        <input type="radio" id="star4" name="Rating" value="4" />
+                        <label for="star4" title="4 stars">★</label>
+
+                        <input type="radio" id="star3" name="Rating" value="3" />
+                        <label for="star3" title="3 stars">★</label>
+
+                        <input type="radio" id="star2" name="Rating" value="2" />
+                        <label for="star2" title="2 stars">★</label>
+
+                        <input type="radio" id="star1" name="Rating" value="1" />
+                        <label for="star1" title="1 star">★</label>
+                    </div>
+                    <div class="invalid-feedback">Please select a rating.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Comment</label>
+                    <textarea name="Comment" class="form-control" rows="3" placeholder="Write your review here..." required></textarea>
+                    <div class="invalid-feedback">Please enter your comment.</div>
+                </div>
+
+                <button type="submit" class="btn btn-gradient px-4 fw-semibold rounded-pill shadow-sm">
+                    Submit Review
+                </button>
+            </form>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="alert alert-info rounded-4 shadow-sm d-flex align-items-center gap-2">
+            <i class="fas fa-info-circle"></i>
+            <span>👉 Please <a asp-area="Identity" asp-controller="Account" asp-action="Login" class="fw-bold text-decoration-underline">login</a> to leave a review.</span>
+        </div>
+    </div>
+}
+
+<!-- Top Courses Section -->
+<div class="container py-5">
+    <h2 class="fw-bold mb-5 text-center text-gradient">🔥 Top Courses</h2>
+
+    <div class="row g-4">
+        @foreach (var course in Model.TopCourses)
+        {
+            <div class="col-md-6 col-lg-3">
+                <div class="card course-card shadow-sm border-0 h-100 rounded-4 overflow-hidden bg-white">
+                    <!-- Course Image -->
+                    <div class="card-img-container">
+                        <img src="~/images/@course.MainImg" class="card-img-top" alt="@course.Name" />
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title fw-bold text-dark">@course.Name</h6>
+
+                        <p class="card-text text-secondary small mb-2 d-flex align-items-center gap-1">
+                            <i class="fas fa-user-tie"></i>
+                            @course.Instructor?.ApplicationUser ?.FullName
+                        </p>
+
+                        <p class="card-text text-success small mb-3 d-flex align-items-center gap-1">
+                            <i class="fas fa-dollar-sign"></i>
+                            @course.Price.ToString("C")
+                        </p>
+
+                        <div class="mt-auto">
+                            <a href="@Url.Action("Details", "ExternalStudent", new { id = course.Id, area = "Customer" })"
+                               class="btn btn-sm btn-gradient w-100 fw-semibold rounded-pill shadow-sm">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        /* Gradient Title */
+        .text-gradient {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Course Cards */
+        .course-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+            .course-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 12px 30px rgba(78, 84, 200, 0.25);
+            }
+
+        .card-img-container {
+            height: 160px;
+            overflow: hidden;
+            border-bottom-left-radius: 1.2rem;
+            border-bottom-right-radius: 1.2rem;
+        }
+
+            .card-img-container img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.4s ease;
+            }
+
+        .course-card:hover .card-img-container img {
+            transform: scale(1.1);
+        }
+
+        /* Buttons */
+        .btn-gradient {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 84, 200, 0.3);
+        }
+
+            .btn-gradient:hover,
+            .btn-gradient:focus {
+                opacity: 0.9;
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(78, 84, 200, 0.4);
+                outline: none;
+            }
+
+        /* Form */
+        .form-label {
+            color: #4e54c8;
+        }
+
+        /* Reviews */
+        .list-group-item {
+            background-color: #f9f9ff;
+            border: 1px solid #e0e0f7;
+            transition: box-shadow 0.3s ease;
+        }
+
+            .list-group-item:hover {
+                box-shadow: 0 6px 20px rgba(78, 84, 200, 0.15);
+            }
+
+        /* Alerts */
+        .alert-info {
+            background-color: #e7f0ff;
+            color: #3a5bcc;
+            border: 1px solid #a3c0ff;
+        }
+
+        /* Star Rating */
+        .star-rating {
+            direction: rtl;
+            font-size: 2rem;
+            unicode-bidi: bidi-override;
+            display: inline-flex;
+            gap: 0.3rem;
+            cursor: pointer;
+        }
+
+            .star-rating input[type="radio"] {
+                display: none;
+            }
+
+            .star-rating label {
+                color: #ccc;
+                transition: color 0.3s;
+                user-select: none;
+            }
+
+                .star-rating label:hover,
+                .star-rating label:hover ~ label {
+                    color: #f5b301;
+                }
+
+            .star-rating input[type="radio"]:checked + label,
+            .star-rating input[type="radio"]:checked + label ~ label {
+                color: #f5b301;
+            }
+    </style>
+
+    <script>
+        // Bootstrap form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+}

@@ -1,0 +1,50 @@
+﻿@using Entities.ViewModel
+@model EditProfileVM
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg border-0 rounded-4 p-4"
+         style="width: 500px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);">
+        <h3 class="text-center fw-bold mb-3">✏️ Edit Profile</h3>
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3">
+                <label asp-for="FirstName" class="form-label"></label>
+                <input asp-for="FirstName" class="form-control rounded-pill" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" class="form-control rounded-pill" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                <input asp-for="UserName" class="form-control rounded-pill" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control rounded-pill" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label"></label>
+                <input asp-for="Address" class="form-control rounded-pill" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 rounded-pill shadow">
+                <i class="bi bi-save"></i> Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+

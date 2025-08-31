@@ -1,0 +1,310 @@
+﻿@model Entities.ViewModel.CommunityVM
+@{
+    ViewData["Title"] = "Community";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container max-w-4xl mx-auto mt-6" style="max-width: 900px; margin: 2rem auto;">
+
+    <!-- Course Info -->
+    <div class="card shadow-lg mb-5 rounded-4 overflow-hidden">
+        <div class="card-body text-white p-5 course-header" style="background-color: @(Model.Color ?? "#0d6efd");">
+            <h2 class="fw-bold mb-3">@Model.Course?.Name</h2>
+            <p class="mb-4 opacity-90">@Model.Course?.Description</p>
+            <div class="d-flex flex-column gap-2">
+                <p class="mb-1 d-flex align-items-center">
+                    <i class="bi bi-person-badge me-2"></i>
+                    <strong>Doctor:</strong>
+                    <span class="me-2">@Model.Course?.Doctor?.ApplicationUser.FullName </span>
+                </p>
+                @if (Model.Assistants != null && Model.Assistants.Any())
+                {
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-people me-2"></i>
+                        <strong class="me-2">Assistants:</strong>
+                        <div class="d-flex gap-2 flex-wrap">
+                            @foreach (var assistant in Model.Assistants)
+                            {
+                                <span class="badge-assistant">@assistant</span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Create New Post -->
+    <div class="card shadow-sm mb-5 rounded-4">
+        <div class="card-body p-4">
+            <form id="postForm" asp-action="CreatePost" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="CourseId" value="@Model.Course.Id" />
+                <div class="d-flex align-items-start gap-3">
+                    <div class="avatar-placeholder">
+                        <i class="bi bi-person-fill text-primary fs-5"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden mb-2">
+                            <input type="text" name="Content" class="form-control post-input" placeholder="Share something with your classmates..." />
+                            <button type="submit" class="btn btn-primary btn-post d-flex align-items-center">
+                                <i class="bi bi-send me-1"></i> Post
+                            </button>
+                        </div>
+
+                        <div class="d-flex gap-2 flex-wrap mb-2">
+                            <button type="button" class="btn btn-outline-secondary action-btn d-flex align-items-center gap-1" id="btnSelectFiles">
+                                <i class="bi bi-paperclip"></i> Files / Images
+                            </button>
+                            <input type="file" id="filesInput" name="Files" multiple
+                                   accept="image/*,application/pdf,.doc,.docx" class="d-none" />
+                            <input type="text" name="Link" class="form-control" placeholder="Add a link..." style="max-width: 200px;" />
+                        </div>
+
+                        <!-- Display selected files -->
+                        <div id="selectedFiles" class="mt-2"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    @if (Model.Posts != null && Model.Posts.Any())
+    {
+        @foreach (var post in Model.Posts)
+        {
+            <div class="card shadow-sm border-0 mb-4 rounded-4 hover-shadow">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3 gap-3">
+                        <div class="avatar-placeholder">
+                            <i class="bi bi-person-fill text-secondary fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">@post.Author?.UserName </h6>
+                            <small class="text-muted time-stamp">@post.PostDate.ToString("MMM dd, yyyy HH:mm")</small>
+                        </div>
+                    </div>
+                    <p class="mt-2 mb-3">@post.Content</p>
+                    @if (post.Files != null && post.Files.Any())
+                    {
+                        <div class="mb-2 d-flex flex-wrap gap-2">
+                            @foreach (var file in post.Files)
+                            {
+                                var extension = System.IO.Path.GetExtension(file.FilePath).ToLower();
+
+                                if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif")
+                                {
+                                    <img src="@file.FilePath" alt="@System.IO.Path.GetFileName(file.FilePath)"
+                                         style="max-width:150px; border-radius:8px; cursor:pointer;"
+                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-file="@file.FilePath" />
+                                }
+                                else if (extension == ".pdf")
+                                {
+                                    <div style="width:150px; height:200px; border:1px solid #ddd; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer;"
+                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-file="@file.FilePath">
+                                        <i class="bi bi-file-earmark-pdf fs-2 text-danger"></i>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <a href="@file.FilePath" target="_blank" class="d-block">@System.IO.Path.GetFileName(file.FilePath)</a>
+                                }
+                            }
+                        </div>
+                    }
+
+
+                    
+
+                    @if (post.Links != null && post.Links.Any())
+                    {
+                        <div class="mb-2">
+                            @foreach (var link in post.Links)
+                            {
+                                <a href="@link.Url" target="_blank">@link.Url</a>
+                            }
+                        </div>
+                    }
+
+                    <hr />
+                    <h6 class="fw-semibold text-muted mb-3">Comments</h6>
+
+                    @if (post.Comments != null && post.Comments.Any())
+                    {
+                        @foreach (var comment in post.Comments)
+                        {
+                            <div class="d-flex align-items-start gap-2 ms-4 mb-3">
+                                <div class="comment-avatar">
+                                    <i class="bi bi-person-fill text-info fs-6"></i>
+                                </div>
+                                <div>
+                                    <b>@(comment.Author?.UserName ?? "Anonymous")</b>
+                                    <p class="mb-1">@comment.Content</p>
+                                    <small class="text-muted time-stamp">@comment.DatePosted.ToString("MMM dd, yyyy HH:mm")</small>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted ms-4">No comments yet.</p>
+                    }
+
+                    <form asp-action="AddComment" method="post" class="d-flex align-items-center ms-4 mt-2 gap-2">
+                        <input type="hidden" name="PostId" value="@post.Id" />
+                        <div class="comment-avatar">
+                            <i class="bi bi-person-fill text-primary fs-6"></i>
+                        </div>
+                        <input type="text" name="Content" class="form-control comment-input" placeholder="Write a comment..." />
+                        <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 d-flex align-items-center gap-1">
+                            <i class="bi bi-send"></i> Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5 empty-state">
+            <i class="bi bi-chat-dots fs-1 d-block mb-3"></i>
+            <p class="mb-0 fs-5">No posts yet. Be the first to start the discussion!</p>
+        </div>
+    }
+</div>
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body p-0 position-relative">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <iframe id="previewIframe" src="" frameborder="0" style="width:100%; height:90vh;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const btnSelectFiles = document.getElementById("btnSelectFiles");
+        const filesInput = document.getElementById("filesInput");
+        const selectedFilesDiv = document.getElementById("selectedFiles");
+
+        btnSelectFiles.addEventListener("click", () => filesInput.click());
+
+        filesInput.addEventListener("change", () => {
+            selectedFilesDiv.innerHTML = "";
+            const files = filesInput.files;
+            if (files.length > 0) {
+                const list = document.createElement("ul");
+                for (let i = 0; i < files.length; i++) {
+                    const li = document.createElement("li");
+                    li.textContent = files[i].name;
+                    list.appendChild(li);
+                }
+                selectedFilesDiv.appendChild(list);
+            }
+        });
+                const previewModal = document.getElementById('filePreviewModal');
+        const previewIframe = document.getElementById('previewIframe');
+
+        previewModal.addEventListener('show.bs.modal', function (event) {
+            const trigger = event.relatedTarget;
+            const fileUrl = trigger.getAttribute('data-file');
+            previewIframe.src = fileUrl;
+        });
+
+        previewModal.addEventListener('hidden.bs.modal', function () {
+            previewIframe.src = "";
+        });
+    </script>
+}
+
+
+
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --light-bg: #f8f9fa;
+        }
+
+        .course-header {
+            position: relative;
+            overflow: hidden;
+        }
+
+            .course-header::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: rgba(255,255,255,0.1);
+                clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+            }
+
+        .avatar-placeholder, .comment-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--light-bg);
+            border: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        .avatar-placeholder {
+            width: 50px;
+            height: 50px;
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+        }
+
+        .post-input, .comment-input {
+            border-radius: 50px !important;
+            border: 1px solid #dee2e6;
+            padding: 10px 18px;
+        }
+
+            .post-input:focus, .comment-input:focus {
+                box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
+                border-color: var(--primary-color);
+            }
+
+        .btn-post {
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-weight: 500;
+        }
+
+        .action-btn {
+            border-radius: 50px;
+            padding: 6px 15px;
+            font-size: 0.85rem;
+        }
+
+        .badge-assistant {
+            background-color: #e9f2ff;
+            color: var(--primary-color);
+            border-radius: 50px;
+            padding: 6px 12px;
+            font-weight: 500;
+        }
+
+        .hover-shadow:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
+            transform: translateY(-3px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .empty-state {
+            color: #9aa0a6;
+        }
+
+        .time-stamp {
+            font-size: 0.8rem;
+        }
+    </style>
+}

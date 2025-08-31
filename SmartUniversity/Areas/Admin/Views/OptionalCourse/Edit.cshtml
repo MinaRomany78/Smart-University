@@ -1,0 +1,107 @@
+﻿@using Entities.ViewModel
+@model OptionalCourseVM
+@{
+    ViewData["Title"] = "Edit Optional Course";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm rounded-3">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Edit Optional Course</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label"></label>
+                    <input asp-for="Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <!-- Current Image -->
+                @if (!string.IsNullOrEmpty(ViewBag.mainImg))
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Current Image</label><br />
+                        <img src="~/Images/@ViewBag.mainImg" alt="Current Image"
+                             style="max-width:200px; border-radius:8px; margin-bottom:10px;" />
+                    </div>
+                }
+
+                <!-- Upload New Image -->
+                <div class="mb-3">
+                    <label class="form-label">Upload New Image</label>
+                    <input type="file" name="MainImg" id="MainImg" class="form-control" />
+                    <img id="imgPreview" src="#" alt="Preview"
+                         style="display:none; margin-top:10px; max-width:200px; border-radius:8px;" />
+                </div>
+
+                <!-- Promo Code -->
+                <div class="mb-3">
+                    <label class="fw-bold">PromoCode</label>
+                    <select asp-for="PromoCode"
+                            asp-items="@(new SelectList(Model.PromoCodes, "Code", "DisplayText", Model.PromoCode))"
+                            class="form-select">
+                        <option value="">-- Select PromoCode --</option>
+                    </select>
+                </div>
+
+                <!-- Availability -->
+                <div class="form-check mb-3">
+                    <input asp-for="IsAvailableForUniversityStudents" class="form-check-input" />
+                    <label asp-for="IsAvailableForUniversityStudents" class="form-check-label"></label>
+                </div>
+
+                <!-- Instructor -->
+                <div class="mb-3">
+                    <label class="fw-bold">Instructor</label>
+                    <select asp-for="InstructorId"
+                            asp-items="@(new SelectList(Model.Instructors, "Id", "ApplicationUser.FullName", Model.InstructorId))"
+                            class="form-select">
+                        <option value="">-- Select Instructor --</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-pencil-square me-1"></i> Update
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const input = document.getElementById('MainImg');
+        const preview = document.getElementById('imgPreview');
+
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.setAttribute('src', e.target.result);
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    </script>
+}
+

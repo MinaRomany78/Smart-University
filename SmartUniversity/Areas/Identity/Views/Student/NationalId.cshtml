@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Student Portal Login";
+}
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="glass-card p-5 text-center" style="max-width: 500px; width:100%;">
+
+        <!-- اللوجو -->
+        <img src="~/images/Logo1.png" alt="Student Portal" style="height: 70px;" class="mb-3">
+
+        <!-- العنوان -->
+        <h2 class="fw-bold">Student Portal Login</h2>
+        <p class="text-muted">Enter your national ID to access your account</p>
+
+        <!-- الفورم -->
+        <form asp-action="NationalId" asp-controller="Student" asp-area="Identity" method="post" class="mt-4">
+
+            <!-- National ID -->
+            <div class="mb-4 text-start">
+                <label for="nationalId" class="form-label fw-semibold">National ID Number</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-primary text-white">
+                        <i class="fas fa-id-card"></i>
+                    </span>
+                    <input type="text" class="form-control" id="nationalId" name="nationalId"
+                           placeholder="Enter your 14-digit national ID"
+                           pattern="\d{14}"
+                           title="Please enter exactly 14 digits"
+                           required>
+                </div>
+                <div class="form-text">Your national ID must be exactly 14 digits</div>
+            </div>
+
+            <!-- الأزرار -->
+            <div class="d-grid gap-3">
+                <button type="submit" class="btn btn-primary btn-lg rounded-3 shadow">
+                    <i class="fas fa-sign-in-alt me-2"></i> Send Personal Information
+                </button>
+                <a asp-area="Identity" asp-controller="Home" asp-action="Index"
+                   class="btn btn-outline-secondary btn-lg rounded-3 shadow">
+                    <i class="fas fa-arrow-left me-2"></i> Back
+                </a>
+            </div>
+        </form>
+
+        <!-- Sign In -->
+        <div class="mt-4 pt-3 border-top">
+            <p>
+                Already Know Personal Data?
+                <a asp-area="Identity" asp-controller="Account" asp-action="Login" class="fw-semibold">Sign In</a>
+            </p>
+        </div>
+    </div>
+</div>

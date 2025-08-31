@@ -1,0 +1,239 @@
+@model IEnumerable<Entities.ViewModel.RegisterCoursesVM>
+
+@{
+    ViewData["Title"] = "Register Courses";
+}
+@if (ViewBag.NoCoursesMessage != null)
+{
+    <div class="alert alert-warning text-center">
+        @ViewBag.NoCoursesMessage
+    </div>
+}
+else
+{
+<div class="container mt-5">
+
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <!-- Card Header -->
+        <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+            <h2 class="mb-0 gradient-text">
+                <i class="bi bi-journal-check gradient-icon"></i> Register Courses
+            </h2>
+        </div>
+
+        <div class="card-body p-4">
+            <form asp-action="RegisterCourses" method="post">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center shadow-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="text-center">Select</th>
+                                <th scope="col" class="text-start">Course Name</th>
+                                <th scope="col" class="text-center">Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var course in Model)
+                            {
+                                <tr class="course-row">
+                                    <td class="text-center">
+                                        
+                                        <input type="checkbox" class="form-check-input shadow-sm course-checkbox"
+                                               data-credits="@course.Credits"
+                                               name="SelectedCourses"
+                                               value="@course.CourseId"
+                                               @(course.IsSelected ? "checked disabled" : "") />
+
+                                        @if (course.IsSelected)
+                                        {
+                                            <!-- Hidden input to submit already registered course -->
+                                            <input type="hidden" name="SelectedCourses" value="@course.CourseId" />
+                                        }
+
+
+                                    </td>
+                                    <td class="text-start fw-semibold">
+                                        <i class="bi bi-book-half text-primary me-2"></i> @course.Name
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge credits-badge">@course.Credits</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Credit Counter -->
+                <div class="d-flex justify-content-between align-items-center mt-4 p-3 selection-info">
+                    <div>
+                        <p class="mb-0">
+                            ⚠️ You must select between
+                            <span class="fw-bold text-primary">15</span> and
+                            <span class="fw-bold text-primary">18</span> credit hours.
+                        </p>
+                        <p class="mb-0 mt-1">
+                            Selected credits: <span id="selectedCredits" class="credit-counter">0</span>
+                        </p>
+                    </div>
+                    <button type="submit" class="btn btn-register">
+                        <i class="bi bi-check-circle-fill"></i> Register Selected
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
+
+<!-- CSS -->
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #3a7bd5, #00d2ff);
+        --secondary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+        --success-gradient: linear-gradient(135deg, #56ab2f, #a8e063);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .gradient-icon,
+    .gradient-text {
+        background: linear-gradient(135deg, #fff, #e6e6e6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+
+    .card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow);
+        }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        padding: 1rem 0.75rem;
+        background-color: rgba(58, 123, 213, 0.1);
+    }
+
+    .table td {
+        padding: 1.25rem 0.75rem;
+        vertical-align: middle;
+    }
+
+    .course-row {
+        transition: var(--transition);
+    }
+
+        .course-row:hover {
+            background-color: rgba(58, 123, 213, 0.05);
+            transform: translateX(5px);
+        }
+
+    .form-check-input {
+        width: 1.25em;
+        height: 1.25em;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .form-check-input:checked {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+
+    .credits-badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        background: var(--primary-gradient);
+        color: #fff;
+    }
+
+    .selection-info {
+        background-color: rgba(58, 123, 213, 0.1);
+        border-radius: 12px;
+    }
+
+    .btn-register {
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        background: var(--success-gradient);
+        border: none;
+        transition: var(--transition);
+        color: #fff;
+    }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .credit-counter {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #3a7bd5;
+    }
+</style>
+
+@section Scripts {
+    <script>
+               $(function () {
+            // Toastr setup
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-bottom-right",
+                "timeOut": "4000"
+            };
+
+            // Success / Error messages
+            @if (TempData["success-notification"] != null)
+            {
+                    <text>toastr.success('@TempData["success-notification"]');</text>
+            }
+            @if (TempData["error-notification"] != null)
+            {
+                    <text>toastr.error('@TempData["error-notification"]');</text>
+            }
+
+            // ⬇️ نبدأ بعدد الساعات المسجلة قبل كده
+            let totalCredits = @ViewBag.AlreadyRegisteredCredits;
+            $("#selectedCredits").text(totalCredits);
+
+            // Auto calculate selected credits
+            $(".course-checkbox").on("change", function () {
+                // نبدأ بعدد الساعات المسجلة أصلاً
+                totalCredits = @ViewBag.AlreadyRegisteredCredits;
+
+                $(".course-checkbox:checked:not(:disabled)").each(function () {
+                    totalCredits += parseInt($(this).data("credits"));
+                });
+
+                $("#selectedCredits").text(totalCredits);
+
+                // Validation UI
+                if (totalCredits < 15 || totalCredits > 18) {
+                    $("#selectedCredits").css("color", "#dc3545");
+                } else {
+                    $("#selectedCredits").css("color", "#198754");
+                }
+            });
+        });
+
+    </script>
+}
+

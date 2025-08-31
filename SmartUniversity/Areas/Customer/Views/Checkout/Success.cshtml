@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Payment Success";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow-lg border-0 rounded-4 p-5">
+        <h2 class="text-success fw-bold mb-3">🎉 Payment Successful</h2>
+        <p class="lead">Your courses have been paid successfully.</p>
+        <a asp-area="Customer" asp-controller="UniversityStudent" asp-action="MyCourses"
+           class="btn btn-primary mt-3 rounded-pill">
+            📚 Back to My Courses
+        </a>
+    </div>
+</div>

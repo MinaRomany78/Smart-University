@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Payment Cancelled";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow-lg border-0 rounded-4 p-5">
+        <h2 class="text-danger fw-bold mb-3">⚠ Payment Cancelled</h2>
+        <p class="lead">Your payment was not completed. Please try again.</p>
+        <a asp-area="Customer" asp-controller="UniversityStudent" asp-action="MyCourses"
+           class="btn btn-outline-primary mt-3 rounded-pill">
+            🔙 Back to My Courses
+        </a>
+    </div>
+</div>

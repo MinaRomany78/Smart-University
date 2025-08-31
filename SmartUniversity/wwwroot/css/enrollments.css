@@ -1,0 +1,153 @@
+﻿/* enrollments.css */
+.enrollment-body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+    background: #fff;
+    border-right: 1px solid #e8eaed;
+    min-height: 100vh;
+}
+
+.sidebar-inner {
+    position: sticky;
+    top: 0;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1a73e8;
+}
+
+.sidebar .nav-link {
+    color: #5f6368;
+    padding: 10px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+        background: #e8f0fe;
+        color: #1a73e8;
+    }
+
+/* Cards */
+.classroom-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    background: #fff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+    .classroom-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+.classroom-card-header {
+    height: 100px;
+    color: white;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.course-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.teacher-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.teacher-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.teacher-info {
+    flex: 1;
+}
+
+.teacher-label {
+    font-size: 0.8rem;
+    color: #5f6368;
+}
+
+.teacher-name {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.assistant-badges {
+    margin-top: 8px;
+}
+
+    .assistant-badges .badge {
+        background: #f1f3f4;
+        color: #3c4043;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 6px 10px;
+        border-radius: 12px;
+        margin: 2px;
+        display: inline-block;
+    }
+
+/* Page title */
+.page-title {
+    color: #202124;
+    font-weight: 600;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e8eaed;
+}
+
+/* Actions */
+.card-actions {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid #e8eaed;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    background: #e8f0fe;
+    border: none;
+    color: #1a73e8;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+    .action-btn:hover {
+        background: #d2e3fc;
+    }

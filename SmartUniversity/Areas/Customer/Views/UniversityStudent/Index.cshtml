@@ -1,0 +1,235 @@
+﻿
+    <style>
+        :root {
+            --primary-color: #3a86ff;
+            --secondary-color: #ff006e;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--dark-color);
+            font-weight: 500;
+            margin: 0 8px;
+        }
+
+            .nav-link:hover {
+                color: var(--primary-color);
+            }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 8px 20px;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 8px 20px;
+        }
+
+            .btn-outline-primary:hover {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+    .hero-section {
+        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        text-align: center;
+        /* الجديد */
+        min-height: 80vh; /* يديك 80% من ارتفاع الشاشة */
+        display: flex;
+        align-items: center; /* يخلي المحتوى يتوسّط عموديًا */
+        justify-content: center;
+        flex-direction: column;
+        padding: 100px 20px; /* padding زيادة لو عايز */
+    }
+
+
+        .discount-badge {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            padding: 15px 20px;
+            border-radius: 50px 0 0 50px;
+            border: none;
+        }
+
+        .search-btn {
+            padding: 15px 25px;
+            border-radius: 0 50px 50px 0;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .features-section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+        }
+
+        .feature-box {
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+            .feature-box:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .feature-description {
+            color: #6c757d;
+        }
+
+       
+
+    </style>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="discount-badge">
+            Register Your Courses Easily
+        </div>
+        <h1 class="hero-title">Smart University System<br>for Course Registration</h1>
+        <p class="hero-subtitle">
+            Save time and manage your academic journey online. Register courses, check schedules,
+            and connect with professors and teaching assistants.
+        </p>
+        <div class="search-box">
+            <div class="input-group">
+                <input type="text" class="form-control search-input" placeholder="Search courses or professors...">
+                <button class="btn search-btn">Search</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">Why Use Our University System?</h2>
+        <p class="section-subtitle">We provide students with an easy and smart way to manage their studies</p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="feature-title">Course Registration</h3>
+                    <p class="feature-description">
+                        Quickly register or drop your courses with just a few clicks.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3 class="feature-title">Professors & Assistants</h3>
+                    <p class="feature-description">
+                        View professor details, office hours, and teaching assistants for each course.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Class Schedules</h3>
+                    <p class="feature-description">
+                        Keep track of your weekly schedule and avoid time conflicts.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+

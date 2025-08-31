@@ -1,0 +1,81 @@
+﻿@model SupportTicket
+@{
+    ViewData["Title"] = "Submit Support Ticket";
+}
+
+<style>
+    .ticket-form-card {
+        backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 20px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+        padding: 30px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+        .ticket-form-card h2 {
+            font-weight: 700;
+            color: #0d6efd;
+        }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(45deg, #0d6efd, #6610f2);
+        color: white;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        border: none;
+    }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+</style>
+
+<div class="ticket-form-card mt-5">
+    <h2 class="text-center mb-4">Submit a Support Ticket</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label asp-for="SenderName" class="form-label">Your Name</label>
+            <input asp-for="SenderName" class="form-control" required />
+            <span asp-validation-for="SenderName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SenderEmail" class="form-label">Email</label>
+            <input asp-for="SenderEmail" class="form-control" type="email" required />
+            <span asp-validation-for="SenderEmail" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="IssueDescription" class="form-label">Issue Description</label>
+            <textarea asp-for="IssueDescription" class="form-control" rows="5" required></textarea>
+            <span asp-validation-for="IssueDescription" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Priority" class="form-label">Priority</label>
+            <select asp-for="Priority" class="form-select">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-submit w-100">Submit Ticket</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
+

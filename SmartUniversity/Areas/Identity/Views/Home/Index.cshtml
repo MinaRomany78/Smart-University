@@ -1,0 +1,87 @@
+﻿
+
+
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+        }
+
+        .role-btn-animated {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 1rem;
+        }
+
+            .role-btn-animated:hover {
+                transform: scale(1.05);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+    </style>
+
+
+
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="glass-card p-5 text-center shadow-lg">
+                    <img src="images/Logo1.png" alt="University Logo" class="mb-4" style="height: 90px;">
+
+                    <h1 class="mb-3 fw-bold">Welcome to Smart University</h1>
+                    <p class="lead text-muted mb-5">Please select your role to continue</p>
+
+                    <div class="row g-4 justify-content-center">
+                        <!-- Student -->
+                        <div class="col-md-4">
+                        <a href="@Url.Action("NationalId", "Student", new { area = "Identity" })"
+                               class="btn w-100 text-white py-4 d-flex flex-column align-items-center justify-content-center role-btn-animated"
+                               style="background: linear-gradient(135deg, #4361ee, #4895ef);">
+                                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                                <span class="fw-semibold">Student</span>
+                            </a>
+                        </div>
+
+                        <!-- University Staff -->
+                    <div class="col-md-4">
+                        <a href="@Url.Action("Register", "Account", new { area = "Identity" })"
+                           class="btn w-100 text-white py-4 d-flex flex-column align-items-center justify-content-center role-btn-animated"
+                           style="background: linear-gradient(135deg, #3a0ca3, #560bad);">
+                            <i class="fas fa-laptop-code fa-2x mb-2"></i>
+                            <span class="fw-semibold">University Course </span>
+                        </a>
+                    </div>
+
+
+                        <!-- Doctor/Assistant -->
+                        <div class="col-md-4">
+                            <a href="@Url.Action("staff", "Home", new { area = "Customer" })"
+                               class="btn w-100 text-white py-4 d-flex flex-column align-items-center justify-content-center role-btn-animated"
+                               style="background: linear-gradient(135deg, #7209b7, #b5179e);">
+                                <i class="fas fa-user-md fa-2x mb-2"></i>
+                                <span class="fw-semibold">Doctor / Assistant</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 pt-4 border-top">
+                        <p class="text-muted mb-0">
+                            Need help? <a href="/Customer/SupportTicket/create" class="text-decoration-none fw-semibold">Contact support</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @section Scripts{
+        <script>
+                @if (TempData["success-notification"] is not null)
+    {
+            <text>toastr.success('@TempData["success-notification"]');</text>
+    }
+    @if (TempData["error-notification"] is not null)
+    {
+            <text>toastr.error('@TempData["error-notification"]');</text>
+    }
+        </script>
+    }

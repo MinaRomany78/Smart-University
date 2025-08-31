@@ -1,0 +1,115 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "_Layout";
+}
+
+<!-- Hero Section -->
+<section class="hero py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Text -->
+            <div class="col-md-6 mb-5 mb-md-0">
+                <div class="badge bg-success text-white px-3 py-2 rounded-pill mb-3 shadow-sm">
+                    🎉 GET 30% OFF ON FIRST ENROLL
+                </div>
+                <h1 class="display-4 fw-bold mb-3 text-gradient">
+                    Learn Engineering <br> From Top Experts
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Build skills with our courses and mentors from world-class companies.
+                    Join a vibrant community and start your journey today!
+                </p>
+                <div class="input-group mb-4 shadow">
+                    <input type="text" class="form-control p-3 border-0" placeholder="Search engineering courses...">
+                    <button class="btn btn-primary px-4">Search</button>
+                </div>
+                <!-- Features -->
+                <div class="d-flex flex-wrap gap-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-primary fs-5 me-2"></i>
+                        <span>Flexible Schedules</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-primary fs-5 me-2"></i>
+                        <span>Guided Learning Paths</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-primary fs-5 me-2"></i>
+                        <span>Peer Support Community</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="col-md-6 text-center">
+                <img src="~/images/mahila.png" alt="Hero Image" class="img-fluid floating" style="max-height: 420px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section text-center my-5 py-5">
+    <div class="container">
+        <h2 class="cta-title fw-bold mb-3">🚀 Start Your Learning Journey Today</h2>
+        <p class="lead mb-4">Join thousands of students who are advancing their careers with our courses.</p>
+        <a href="/Courses" class="cta-btn shadow-lg">Get Started Now</a>
+    </div>
+</section>
+
+@section Scripts {
+    <style>
+        /* Gradient Title */
+        .text-gradient {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Floating Animation for Image */
+        .floating {
+            animation: float 4s ease-in-out infinite;
+        }
+
+       float {
+            0%
+
+        {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-12px);
+        }
+
+        100% {
+            transform: translateY(0px);
+        }
+
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 20px;
+        }
+
+        .cta-btn {
+            background: white;
+            color: var(--primary);
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: none;
+            transition: 0.3s;
+        }
+
+            .cta-btn:hover {
+                background: var(--accent);
+                color: white;
+                transform: translateY(-3px);
+            }
+    </style>
+}

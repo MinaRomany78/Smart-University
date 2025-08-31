@@ -1,0 +1,161 @@
+﻿@using Entities.ViewModel
+@model CartVM
+
+<div class="container py-4">
+    <h2 class="mb-4 text-gradient fw-bold">Your Cart 🛒</h2>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="alert alert-info rounded-4 shadow-sm py-3">
+            Your cart is empty.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm rounded-4 overflow-hidden mb-4">
+            <table class="table align-middle mb-0 bg-white">
+                <thead class="bg-gradient text-white">
+                    <tr>
+                        <th scope="col" class="py-3">Course</th>
+                        <th scope="col" class="py-3">Original Price</th>
+                        <th scope="col" class="py-3">Discount</th>
+                        <th scope="col" class="py-3">Final Price</th>
+                        <th scope="col" class="py-3">Promo Code</th>
+                        <th scope="col" class="py-3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-semibold text-dark">@item.CourseName</td>
+                            <td>@item.OriginalPrice.ToString("C")</td>
+                            <td>
+                                @(item.DiscountPercentage.HasValue ? (item.DiscountPercentage.Value * 100) + "%" : "-")
+                            </td>
+                            <td class="fw-bold text-success">@item.FinalPrice.ToString("C")</td>
+                            <td class="text-muted">@item.AppliedPromoCode</td>
+                            <td>
+                                <form asp-action="RemoveFromCart" asp-route-id="@item.CourseId" method="post" class="m-0">
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm" title="Remove from cart">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-gradient mb-0">Total: <span class="text-success">@Model.TotalPrice.ToString("C")</span></h4>
+            <form asp-action="Checkout" method="post" class="m-0">
+                <button type="submit" class="btn btn-gradient rounded-pill px-4 py-2 shadow-sm fw-semibold">
+                    Proceed to Checkout
+                </button>
+            </form>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <style>
+        /* Gradient background for table header */
+        .bg-gradient {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        /* Table styles */
+        table {
+            border-collapse: separate;
+            border-spacing: 0 0.75rem;
+        }
+
+        thead th {
+            border: none !important;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        tbody tr {
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(78, 84, 200, 0.1);
+            border-radius: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            tbody tr:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(78, 84, 200, 0.2);
+            }
+
+        tbody td {
+            vertical-align: middle;
+            border: none !important;
+            padding: 1rem 1.25rem;
+        }
+
+        /* Buttons */
+        .btn-gradient {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+            .btn-gradient:hover,
+            .btn-gradient:focus {
+                opacity: 0.9;
+                transform: translateY(-3px);
+                box-shadow: 0 12px 30px rgba(78, 84, 200, 0.5);
+                outline: none;
+            }
+
+        /* Responsive */
+        @@media (max-width: 767.98px) {
+            table thead
+
+        {
+            display: none;
+        }
+
+        table, tbody, tr, td {
+            display: block;
+            width: 100%;
+        }
+
+            tbody tr {
+                margin-bottom: 1.5rem;
+                box-shadow: 0 4px 12px rgba(78, 84, 200, 0.1);
+                border-radius: 1rem;
+                padding: 1rem;
+            }
+
+            tbody td {
+                padding-left: 50%;
+                position: relative;
+                text-align: right;
+            }
+
+                tbody td::before {
+                    content: attr(data-label);
+                    position: absolute;
+                    left: 1.25rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    font-weight: 600;
+                    color: var(--primary-color);
+                    white-space: nowrap;
+                    text-align: left;
+                }
+
+                tbody td:last-child {
+                    text-align: center;
+                    padding-left: 0;
+                }
+
+        }
+    </style>
+}

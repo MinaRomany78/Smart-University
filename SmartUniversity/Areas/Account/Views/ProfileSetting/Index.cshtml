@@ -1,0 +1,55 @@
+﻿@using Entities.Models
+@model ApplicationUser
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            @* Success Message *@
+            @if (TempData["success-notification"] != null)
+            {
+                    <text>
+                        toastr.success('@TempData["success-notification"]');
+                    </text>
+            }
+
+            @* Error Message *@
+            @if (TempData["error-notification"] != null)
+            {
+                    <text>
+                        toastr.error('@TempData["error-notification"]');
+                    </text>
+            }
+        });
+    </script>
+}
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg border-0 rounded-4 p-4"
+         style="width: 500px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);">
+        <div class="text-center mb-4">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="90" class="mb-3" />
+            <h3 class="fw-bold">👋 Welcome, @Model.FullName</h3>
+            <p class="text-muted">Manage your profile settings</p>
+        </div>
+
+        <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item"><b>Username:</b> @Model.UserName</li>
+            <li class="list-group-item"><b>Email:</b> @Model.Email</li>
+            <li class="list-group-item"><b>Full Name:</b> @Model.FullName</li>
+            <li class="list-group-item"><b>Address:</b> @Model.Address</li>
+        </ul>
+
+        <div class="d-flex justify-content-between">
+            <a asp-action="Edit" class="btn btn-primary w-50 me-2">
+                <i class="bi bi-pencil-square"></i> Edit Profile
+            </a>
+            <a asp-action="ChPassword" class="btn btn-warning w-50">
+                <i class="bi bi-lock"></i> Change Password
+            </a>
+        </div>
+    </div>
+</div>
+

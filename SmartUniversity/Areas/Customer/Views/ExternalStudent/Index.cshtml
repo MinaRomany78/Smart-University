@@ -1,0 +1,360 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "_Layout";
+}
+@model IEnumerable<Entities.Models.OptionalCourse>
+
+<!-- Hero Section -->
+<section class="hero py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Text -->
+            <div class="col-md-6 mb-5 mb-md-0">
+                <div class="badge bg-success text-white px-3 py-2 rounded-pill mb-3 shadow-sm hero-badge">
+                    🎉 GET 30% OFF ON FIRST ENROLL
+                </div>
+                <h1 class="display-4 fw-bold mb-3 text-gradient hero-title">
+                    Learn Engineering <br> From Top Experts
+                </h1>
+                <p class="lead text-muted mb-4 hero-subtitle">
+                    Build skills with our courses and mentors from world-class companies.
+                    Join a vibrant community and start your journey today!
+                </p>
+
+                <form method="get" asp-action="Index" asp-controller="ExternalStudent" asp-area="Customer" class="d-flex mb-4 shadow-sm search-form rounded-pill overflow-hidden">
+                    <input type="text" name="searchQuery" class="form-control p-3 border-0" placeholder="Search engineering courses..." />
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold rounded-end-pill">
+                        Search
+                    </button>
+                </form>
+
+                <!-- Features -->
+                <div class="d-flex flex-wrap gap-4 hero-features">
+                    <div class="d-flex align-items-center gap-2 feature-item">
+                        <i class="fas fa-check-circle text-primary fs-5"></i>
+                        <span>Flexible Schedules</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 feature-item">
+                        <i class="fas fa-check-circle text-primary fs-5"></i>
+                        <span>Guided Learning Paths</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 feature-item">
+                        <i class="fas fa-check-circle text-primary fs-5"></i>
+                        <span>Peer Support Community</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="col-md-6 text-center">
+                <img src="~/images/mahila.png" alt="Hero Image" class="img-fluid floating" style="max-height: 420px; border-radius: 1.5rem; box-shadow: 0 15px 40px rgba(78, 84, 200, 0.3);" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section text-center my-5 py-5">
+    <div class="container">
+        <h2 class="cta-title fw-bold mb-3 text-white">🌟 Join Thousands of Students on Their Learning Journey</h2>
+        <p class="lead mb-4 text-white-75">
+            Discover how Smart University is helping learners like you build skills, connect with mentors, and unlock new opportunities.
+        </p>
+        <a href="#" class="cta-btn shadow-lg" data-bs-toggle="modal" data-bs-target="#introVideo" aria-label="Watch Student Stories">
+            ▶ Watch Student Stories
+        </a>
+    </div>
+</section>
+
+<div class="modal fade" id="introVideo" tabindex="-1" aria-hidden="true" aria-labelledby="introVideoLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 overflow-hidden shadow-lg">
+            <div class="ratio ratio-16x9">
+                <iframe src="https://www.youtube.com/embed/gRseQH9EHjY"
+                        title="Smart University Intro"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Courses Section -->
+<div class="container py-5">
+    <h2 class="fw-bold mb-4 text-center text-gradient">📚 Available Courses</h2>
+
+    <div class="row g-4">
+        @foreach (var course in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card course-card shadow-lg border-0 h-100 rounded-4 overflow-hidden bg-white">
+                    <!-- Course Image -->
+                    <div class="card-img-container">
+                        <img src="~/images/@course.MainImg" class="card-img-top" alt="@course.Name" />
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold text-dark">@course.Name</h5>
+
+                        <p class="card-text text-muted mb-2 d-flex align-items-center gap-2">
+                            <i class="fas fa-user-tie text-secondary"></i>
+                            Instructor: <strong>@course.Instructor?.ApplicationUser ?.FullName</strong>
+                        </p>
+
+                        <p class="card-text text-muted mb-2 d-flex align-items-center gap-2">
+                            <i class="fas fa-sticky-note text-secondary"></i>
+                            <span>@course.Description</span>
+                        </p>
+
+                        <p class="card-text text-success mb-3 d-flex align-items-center gap-2">
+                            <i class="fas fa-dollar-sign"></i>
+                            Price: <strong>@course.Price.ToString("C")</strong>
+                        </p>
+
+                        <div class="mt-auto">
+                            <a href="@Url.Action("Details", "ExternalStudent", new { id = course.Id, area = "Customer" })"
+                               class="btn btn-gradient w-100 fw-semibold rounded-pill shadow-sm">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Courses Count Section -->
+    <section class="courses-count-section mt-5">
+        <div class="container text-center">
+            <h2 class="section-title fw-bold mb-3">Available Courses</h2>
+            <div class="courses-count">120+</div>
+            <p class="section-subtitle mb-4">Across different faculties and departments</p>
+            <a href="#" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">Browse All Courses</a>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <style>
+        /* Colors */
+        :root {
+            --primary: #4e54c8;
+            --accent: #8f94fb;
+            --secondary: #6c63ff;
+            --primary-color: #4e54c8;
+        }
+
+        /* Gradient Title */
+        .text-gradient {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Hero Section */
+        .hero-badge {
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 15px rgba(78, 84, 200, 0.3);
+        }
+
+        .hero-title {
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            max-width: 480px;
+        }
+
+        .search-form input.form-control {
+            border-radius: 50px 0 0 50px !important;
+            font-size: 1.1rem;
+        }
+
+        .search-form button {
+            border-radius: 0 50px 50px 0 !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+        }
+
+            .search-form button:hover {
+                background-color: var(--secondary);
+            }
+
+        .hero-features .feature-item {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+            .hero-features .feature-item:hover {
+                color: var(--secondary);
+            }
+
+        /* Floating Animation for Image */
+        @@keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+
+        }
+
+        .floating {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(78, 84, 200, 0.4);
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .cta-btn {
+            background: white;
+            color: var(--primary);
+            padding: 15px 50px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border: none;
+            box-shadow: 0 6px 20px rgba(78, 84, 200, 0.3);
+            transition: all 0.3s ease;
+            display: inline-block;
+            user-select: none;
+        }
+
+            .cta-btn:hover,
+            .cta-btn:focus {
+                background: var(--accent);
+                color: white;
+                transform: translateY(-4px);
+                box-shadow: 0 12px 30px rgba(78, 84, 200, 0.5);
+                outline: none;
+            }
+
+        /* Course Cards */
+        .course-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+            .course-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 40px rgba(78, 84, 200, 0.25);
+            }
+
+        .card-img-container {
+            height: 200px;
+            overflow: hidden;
+            border-top-left-radius: 1.2rem;
+            border-top-right-radius: 1.2rem;
+        }
+
+            .card-img-container img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.4s ease;
+            }
+
+        .course-card:hover .card-img-container img {
+            transform: scale(1.1);
+        }
+
+        .card-body h5 {
+            font-size: 1.25rem;
+        }
+
+        .card-text i {
+            min-width: 20px;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 6px 20px rgba(78, 84, 200, 0.3);
+            border-radius: 50px;
+            user-select: none;
+        }
+
+            .btn-gradient:hover,
+            .btn-gradient:focus {
+                opacity: 0.9;
+                transform: translateY(-3px);
+                box-shadow: 0 12px 30px rgba(78, 84, 200, 0.5);
+                outline: none;
+            }
+
+        /* Courses Count Section */
+        .courses-count-section {
+            background-color: #f8f9fa;
+            padding: 80px 0;
+            text-align: center;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(78, 84, 200, 0.1);
+        }
+
+            .courses-count-section .section-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--primary-color);
+                margin-bottom: 15px;
+            }
+
+        .courses-count {
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            letter-spacing: 0.05em;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .courses-count-section .btn-primary {
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 15px 50px;
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(78, 84, 200, 0.3);
+            transition: all 0.3s ease;
+        }
+
+            .courses-count-section .btn-primary:hover,
+            .courses-count-section .btn-primary:focus {
+                background-color: var(--secondary);
+                box-shadow: 0 12px 30px rgba(78, 84, 200, 0.5);
+                outline: none;
+            }
+    </style>
+}
+
+

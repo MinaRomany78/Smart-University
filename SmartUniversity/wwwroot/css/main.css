@@ -1,0 +1,47 @@
+﻿:root {
+    --primary: #3f51b5;
+    --secondary: #303f9f;
+    --accent: #ff5722;
+    --light: #f5f5f5;
+    --dark: #212121;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+
+    background-image: url('../images/nn.jpg'); /* ضع اسم صورتك */
+    background-size: cover; /* تخلي الصورة تغطي الشاشة كلها */
+    background-position: center; /* تركيز الصورة في النص */
+    background-attachment: fixed; /* الخلفية ثابتة عند السكرول */
+    background-repeat: no-repeat; /* منع التكرار */
+}
+
+
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.role-btn {
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+    .role-btn i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }

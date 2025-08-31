@@ -1,0 +1,58 @@
+﻿@using Entities.ViewModel
+@model AdminCourseVM
+
+@{
+    ViewData["Title"] = "Create Course";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Add New Course</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CreditHours" class="form-label"></label>
+                    <input asp-for="CreditHours" class="form-control" />
+                    <span asp-validation-for="CreditHours" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DepartmentId" class="form-label">Department</label>
+                    <select asp-for="DepartmentId" asp-items="Model.DepartMentList" class="form-select">
+                        <option value="">-- Select Department --</option>
+                    </select>
+                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TermId" class="form-label">Term</label>
+                    <select asp-for="TermId" asp-items="Model.TermList" class="form-select">
+                        <option value="">-- Select Term --</option>
+                    </select>
+                    <span asp-validation-for="TermId" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

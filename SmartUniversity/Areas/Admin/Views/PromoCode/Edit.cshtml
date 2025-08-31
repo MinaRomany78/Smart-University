@@ -1,0 +1,56 @@
+﻿@model PromoCode
+
+@{
+    ViewData["Title"] = "Edit Promo Code";
+}
+
+@section Breadcrumb {
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Promo Codes</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+}
+
+<div class="card shadow-sm mt-3">
+    <div class="card-header">
+        <h5 class="mb-0">Edit Promo Code</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Code" />
+
+            <div class="mb-3">
+                <label asp-for="DiscountPercent" class="form-label"></label>
+                <input asp-for="DiscountPercent" class="form-control" />
+                <span asp-validation-for="DiscountPercent" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Optional Courses</label>
+                <select name="selectedCourses" class="form-select" multiple>
+                    @foreach (var course in (ViewBag.oCourses as IEnumerable<OptionalCourse> ?? Enumerable.Empty<OptionalCourse>()))
+                    {
+                        var selected = (ViewBag.SelectedCourses != null && ((List<int>)ViewBag.SelectedCourses).Contains(course.Id))
+                        ? "selected" : "";
+                        <option value="@course.Id" selected="@(selected == "selected" ? "selected" : null)">
+                            @course.Name
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="IsForUniversityStudentsOnly" class="form-check-input" />
+                <label asp-for="IsForUniversityStudentsOnly" class="form-check-label"></label>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <a asp-action="Index" class="btn btn-secondary me-2">Cancel</a>
+                <button type="submit" class="btn btn-warning">Update</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,58 @@
+﻿/* شاشة التحميل تغطي الشاشة */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #f8f8f8;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+}
+
+    /* تأثير الخروج */
+    #loading-screen.fade-out {
+        opacity: 0;
+    }
+
+/* الدائرة المتحركة */
+.loader-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border: 3px solid rgba(0, 0, 255, 0.1);
+    border-top: 3px solid #4b49ac;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    animation: spin 1s linear infinite;
+}
+
+    /* الأيقونة داخل الدائرة - ثابتة */
+    .loader-circle .icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        color: #4b49ac;
+        z-index: 1;
+        animation: anti-spin 1s linear infinite;
+    }
+
+/* حركة الدوران */
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* عكس الحركة للأيقونة لتبدو ثابتة */
+@keyframes anti-spin {
+    100% {
+        transform: translate(-50%, -50%) rotate(-360deg);
+    }
+}

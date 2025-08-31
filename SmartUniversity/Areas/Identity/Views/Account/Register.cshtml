@@ -1,0 +1,224 @@
+﻿@model Entities.ViewModel.RegisterVM
+
+@{
+    ViewData["Title"] = "Course Enrollment Registration";
+}
+
+<!-- Glass Styles -->
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 1.5rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .form-control {
+        border-radius: .75rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(58, 12, 163, 0.25);
+            border-color: #3a0ca3;
+        }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #3a0ca3, #560bad);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #560bad, #3a0ca3);
+            transform: translateY(-2px);
+        }
+
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="glass-card p-5" style="max-width: 650px; width: 100%;">
+
+        <!-- Title & Subtitle -->
+        <div class="text-center mb-4">
+            <img src="~/images/Logo1.png" alt="Smart University" style="height: 70px;" class="mb-3">          
+            <h2 class="fw-bold mb-1">Course Enrollment</h2>
+            <p class="text-muted">Sign up to access university courses</p>
+        </div>
+
+        <!-- Form -->
+        <form asp-action="Register" method="post" id="registrationForm">
+
+            <!-- Personal Information -->
+            <h5 class="text-primary fw-bold mb-3"><i class="fas fa-user me-2"></i>Personal Information</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="UserName" id="UserName" class="form-control" placeholder=" " required>
+                        <label asp-for="UserName">Username</label>
+                        <span asp-validation-for="UserName" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="FullName" id="FullName" class="form-control" placeholder=" " required>
+                        <label asp-for="FullName">Full Name</label>
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Email" id="Email" type="email" class="form-control" placeholder=" " required>
+                <label asp-for="Email">Email Address</label>
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <!-- Account Security -->
+            <h5 class="text-primary fw-bold mb-3"><i class="fas fa-lock me-2"></i>Account Security</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-floating position-relative">
+                        <input asp-for="Password" id="Password" type="password" class="form-control" placeholder=" " required>
+                        <label asp-for="Password">Password</label>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                        <button type="button" class="btn btn-sm btn-light position-absolute end-0 top-50 translate-middle-y me-2"
+                                onclick="togglePassword('Password', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating position-relative">
+                        <input asp-for="ConfirmPassword" id="ConfirmPassword" type="password" class="form-control" placeholder=" " required>
+                        <label asp-for="ConfirmPassword">Confirm Password</label>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        <button type="button" class="btn btn-sm btn-light position-absolute end-0 top-50 translate-middle-y me-2"
+                                onclick="togglePassword('ConfirmPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Password Strength -->
+            <div class="progress mt-3" style="height: 6px;">
+                <div id="passwordStrength" class="progress-bar rounded-pill" role="progressbar"></div>
+            </div>
+            <small class="text-muted">Password must contain at least 8 characters with uppercase, lowercase, number and special character</small>
+
+            <!-- Terms -->
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                <label class="form-check-label" for="agreeTerms">
+                    I agree to the <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a>
+                </label>
+            </div>
+
+            <!-- Submit -->
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-gradient btn-lg text-white rounded-pill shadow">
+                    <i class="fas fa-user-plus me-2"></i> Register
+                </button>
+            </div>
+        </form>
+
+        <!-- Footer -->
+        <div class="text-center mt-4">
+            Already have an account? <a asp-action="Login" class="fw-bold text-primary text-decoration-none">Sign in here</a>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-4">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Terms of Service</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Course Enrollment Terms</h6>
+                <p>By registering for these courses, you acknowledge that:</p>
+                <ul>
+                    <li>You are enrolling as an independent learner, not as a degree-seeking student</li>
+                    <li>Course completion may provide a certificate but does not confer university credit</li>
+                    <li>Access to some courses may require additional verification</li>
+                    <li>You are responsible for maintaining the confidentiality of your account</li>
+                </ul>
+                <p>Full terms and conditions are available on our website.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-gradient text-white" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId, btn) {
+            const field = document.getElementById(fieldId);
+            const icon = btn.querySelector('i');
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Password strength indicator
+        document.getElementById('Password').addEventListener('input', function () {
+            const strengthBar = document.getElementById('passwordStrength');
+            const strength = calculatePasswordStrength(this.value);
+            strengthBar.style.width = strength.percentage + '%';
+            strengthBar.className = 'progress-bar ' + strength.class;
+        });
+
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            if (password.length > 7) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            let percentage = strength * 20;
+            let barClass = '';
+            if (strength <= 2) {
+                barClass = 'bg-danger';
+            } else if (strength <= 4) {
+                barClass = 'bg-warning';
+            } else {
+                barClass = 'bg-success';
+            }
+            return { percentage: percentage, class: barClass };
+        }
+
+        // Loading indicator
+        document.getElementById('registrationForm').addEventListener('submit', function () {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Processing...';
+        });
+
+        // Toastr notifications
+        @if (TempData["success-notification"] is not null)
+        {
+                <text>toastr.success('@TempData["success-notification"]');</text>
+        }
+        @if (TempData["error-notification"] is not null)
+        {
+                <text>toastr.error('@TempData["error-notification"]');</text>
+        }
+    </script>
+}

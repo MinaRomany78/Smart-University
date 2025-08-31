@@ -1,0 +1,76 @@
+@model IEnumerable<Entities.ViewModel.RegisterCoursesVM>
+
+@{
+    ViewData["Title"] = "My Registered Courses";
+    var pricePerCredit = 50;
+    var totalCredits = Model?.Sum(c => c.Credits) ?? 0;
+    var totalAmount = totalCredits * pricePerCredit;
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <!-- Header -->
+        <div class="card-header text-white text-center py-4"
+             style="background: linear-gradient(135deg, #4e54c8, #8f94fb);">
+            <h2 class="mb-0 fw-bold">📚 My Registered Courses</h2>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body p-4">
+            @if (Model != null && Model.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var course in Model)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 shadow-sm mb-3 rounded-3">
+                            <div>
+                                <h5 class="mb-1 fw-bold text-primary">@course.Name</h5>
+                                <small class="text-muted">Credits: @course.Credits</small>
+                            </div>
+                            <div class="text-end">
+                                <p class="mb-1 fw-bold text-success">@(@course.Credits* pricePerCredit) EGP</p>
+                                <form asp-action="Unregister" method="post" class="d-inline">
+                                    <input type="hidden" name="courseId" value="@course.CourseId" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill">
+                                        ❌ Unregister
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    }
+                </ul>
+
+                <!-- Total & Pay -->
+                <div class="mt-5 text-center">
+                    <h4 class="fw-bold mb-3">
+                        Total: <span class="text-dark">@totalCredits Credits</span> =
+                        <span class="text-success">@totalAmount EGP</span>
+                    </h4>
+
+                    @if (ViewData["error-notification"] != null)
+                    {
+                        <div class="alert alert-danger fw-bold rounded-3 shadow-sm mb-3">
+                            @ViewData["error-notification"]
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-action="Pay" method="post" class="d-inline-block">
+
+                            <button type="submit" class="btn btn-lg btn-success px-5 rounded-pill shadow-lg">
+                                💳 Pay @totalAmount EGP
+                            </button>
+                        </form>
+                    }
+                </div>
+
+            }
+            else
+            {
+                <div class="alert alert-warning text-center p-4 rounded-3 shadow-sm">
+                    You have not registered any courses yet.
+                </div>
+            }
+        </div>
+    </div>
+</div>

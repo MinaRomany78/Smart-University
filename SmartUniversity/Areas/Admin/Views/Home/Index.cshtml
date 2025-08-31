@@ -1,0 +1,224 @@
+﻿@using SmartUniversity
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@section Breadcrumb {
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+        </ol>
+    </nav>
+}
+@section PageActions {
+    <a class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>New User</a>
+    <a class="btn btn-outline-secondary"><i class="bi bi-upload me-2"></i>Import</a>
+}
+
+<div class="row g-3">
+    <!-- KPI Cards -->
+    <div class="col-sm-6 col-xl-2">
+        <div class="card card-soft p-3 kpi kpi-accent-1">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted-2">Students</div>
+                    <div class="value fw-semibold">@ViewBag.totalStudents</div>
+                </div>
+                <i class="bi bi-person-badge fs-2"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card card-soft p-3 kpi kpi-accent-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted-2">Doctors</div>
+                    <div class="value fw-semibold">@ViewBag.totalDoctors</div>
+                </div>
+                <i class="bi bi-person-video3 fs-2"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card card-soft p-3 kpi kpi-accent-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted-2">Assistants</div>
+                    <div class="value fw-semibold">@ViewBag.totalAssistants</div>
+                </div>
+                <i class="bi bi-person-workspace fs-2"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-soft p-3 kpi kpi-accent-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted-2">Courses</div>
+                    <div class="value fw-semibold">@ViewBag.totalCourses</div>
+                </div>
+                <i class="bi bi-journal-text fs-2"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-soft p-3 kpi kpi-accent-1">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted-2">Optional Courses</div>
+                    <div class="value fw-semibold">@ViewBag.totalOptionalCourses</div>
+                </div>
+                <i class="bi bi-journals fs-2"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="col-xl-8">
+        <div class="card card-soft p-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h2 class="h6 mb-0">Enrollment Growth</h2>
+            </div>
+            <canvas id="lineChart" height="120"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card card-soft p-3">
+            <h2 class="h6">Distribution</h2>
+            <canvas id="donutChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Tickets -->
+    <div class="col-12">
+        <div class="card card-soft p-0 table-card">
+            <div class="p-3 d-flex align-items-center justify-content-between">
+                <h2 class="h6 mb-0">Recent Support Tickets</h2>
+                <a asp-area="Admin" asp-controller="SupportTicket" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="table-responsive p-3 pt-0">
+                <table id="ticketsTable" class="table table-hover align-middle w-100">
+                    <thead class="table-light">
+                        <tr>
+                            <th>From</th>
+                            <th>Issue</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in ViewBag.toptickets)
+                        {
+                            <tr>
+                                <td>@ticket.SenderEmail</td>
+                                <td>@ticket.IssueDescription</td>
+                                <td>
+                                    @if (ticket.Priority == TicketPriority.High)
+                                    {
+                                        <span class="badge bg-danger">High</span>
+                                    }
+                                    else if (ticket.Priority == TicketPriority.Medium)
+                                    {
+                                        <span class="badge bg-warning">Medium</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Low</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (ticket.Status == TicketStatus.Open)
+                                    {
+                                        <span class="badge bg-primary">Open</span>
+                                    }
+                                    else if (ticket.Status == TicketStatus.InProgress)
+                                    {
+                                        <span class="badge bg-info">In Progress</span>
+                                    }
+                                    else if (ticket.Status == TicketStatus.Resolved)
+                                    {
+                                        <span class="badge bg-success">Resolved</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-dark">Closed</span>
+                                    }
+                                </td>
+                                <td>@ticket.CreatedDate.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js + DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>
+
+<script>
+    // Line Chart (dummy data for now)
+    const lineCtx = document.getElementById('lineChart');
+    if (lineCtx) {
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],
+                datasets: [{
+                    label: 'Enrollments',
+                    data: [50, 120, 200, 300, 450, 600, 750, 900],
+                    fill: true,
+                    tension: .35,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // Donut Chart
+    const donutCtx = document.getElementById('donutChart');
+    if (donutCtx) {
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Students','Doctors','Assistants','Courses','Optional Courses'],
+                datasets: [{
+                    data: [
+                        @ViewBag.totalStudents,
+                        @ViewBag.totalDoctors,
+                        @ViewBag.totalAssistants,
+                        @ViewBag.totalCourses,
+                        @ViewBag.totalOptionalCourses
+                    ]
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom' } },
+                cutout: '65%'
+            }
+        });
+    }
+
+    // DataTables
+    new DataTable('#ticketsTable', {
+        paging: true,
+        searching: true,
+        info: false,
+        lengthChange: false
+    });
+</script>
+
+
+

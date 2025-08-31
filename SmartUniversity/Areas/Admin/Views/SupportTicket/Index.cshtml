@@ -1,0 +1,207 @@
+﻿@model IEnumerable<SupportTicket>
+@{
+    ViewData["Title"] = "Manage Tickets";
+}
+
+<style>
+    /* Table Style */
+    .dashboard-table {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+        .dashboard-table thead {
+            background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .dashboard-table tbody tr {
+            transition: all 0.2s ease-in-out;
+        }
+
+            .dashboard-table tbody tr:hover {
+                background-color: #f1f5ff;
+                transform: scale(1.01);
+            }
+
+        .dashboard-table td,
+        .dashboard-table th {
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+
+    /* Search Box */
+    .search-box {
+        margin-bottom: 16px;
+        max-width: 300px;
+    }
+
+    /* Custom Buttons */
+    .custom-btn {
+        width: 42px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        transition: all 0.25s ease-in-out;
+    }
+
+        .custom-btn:hover {
+            transform: translateY(-2px) scale(1.07);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .custom-btn i {
+            font-size: 1.2rem;
+        }
+
+    /* Actions Color Borders */
+    .btn-details {
+        border: 1px solid #0dcaf0;
+        color: #0dcaf0;
+    }
+
+    .btn-reply {
+        border: 1px solid #198754;
+        color: #198754;
+    }
+
+    .btn-delete {
+        border: 1px solid #dc3545;
+        color: #dc3545;
+    }
+
+    .btn-details:hover {
+        background-color: #0dcaf0;
+        color: white;
+    }
+
+    .btn-reply:hover {
+        background-color: #198754;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
+
+<div class="mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <input id="TicketSearch" type="text" class="form-control search-box" placeholder="🔍 Search tickets..." />
+    </div>
+
+    <div class="table-responsive dashboard-table">
+        <table class="table align-middle text-center mb-0" id="TicketTable">
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>Email</th>
+                    <th>Issue Description</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ticket in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@ticket.SenderName</td>
+                        <td class="fw-bold">@ticket.SenderEmail</td>
+                        <td>@ticket.IssueDescription</td>
+                        <td>
+                            @if (ticket.Status == TicketStatus.Open)
+                            {
+                                <span class="badge bg-primary">Open</span>
+                            }
+                            else if (ticket.Status == TicketStatus.InProgress)
+                            {
+                                <span class="badge bg-info text-dark">In Progress</span>
+                            }
+                            else if (ticket.Status == TicketStatus.Resolved)
+                            {
+                                <span class="badge bg-success">Resolved</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-dark">Closed</span>
+                            }
+                        </td>
+                        <td>
+                            @if (ticket.Priority == TicketPriority.High)
+                            {
+                                <span class="badge bg-danger">High</span>
+                            }
+                            else if (ticket.Priority == TicketPriority.Medium)
+                            {
+                                <span class="badge bg-warning text-dark">Medium</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Low</span>
+                            }
+                        </td>
+                        <td class="table-actions d-flex justify-content-center">
+                            <a href="@Url.Action("Details", "SupportTicket", new { id = ticket.Id, area = "Admin" })"
+                               class="custom-btn btn-details me-2"
+                               title="Details">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a href="@Url.Action("Reply", "SupportTicket", new { id = ticket.Id, area = "Admin" })"
+                               class="custom-btn btn-reply me-2"
+                               title="Reply">
+                                <i class="bi bi-reply-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(function () {
+            @* Success Message *@
+            @if (TempData["success-notification"] != null)
+            {
+                    <text>
+                        toastr.success('@TempData["success-notification"]');
+                    </text>
+            }
+
+            @* Error Message *@
+            @if (TempData["error-notification"] != null)
+            {
+                    <text>
+                        toastr.error('@TempData["error-notification"]');
+                    </text>
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Search filter
+            const searchInput = document.getElementById('TicketSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function () {
+                    const searchText = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#TicketTable tbody tr');
+                    rows.forEach(row => {
+                        row.style.display = row.textContent.toLowerCase().includes(searchText) ? '' : 'none';
+                    });
+                });
+            }
+        });
+    </script>
+}
+

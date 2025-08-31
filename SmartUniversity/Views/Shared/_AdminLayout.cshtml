@@ -1,0 +1,132 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@ViewData["Title"] - SmartUni Admin</title>
+
+  <!-- Bootstrap 5.3 + Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="~/css/site-admin.css" asp-append-version="true" />
+</head>
+<body class="admin-body">
+  <aside id="sidebar" class="sidebar d-flex flex-column">
+    <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+      <a class="brand d-flex align-items-center gap-2 text-decoration-none" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+        <i class="bi bi-mortarboard-fill fs-4"></i>
+        <span class="brand-text fw-semibold">Smart<span class="text-primary">Uni</span></span>
+      </a>
+      <button class="btn btn-sm btn-outline-secondary d-none d-lg-inline-flex" id="collapseSidebarBtn" aria-label="Collapse sidebar">
+        <i class="bi bi-layout-sidebar-inset"></i>
+      </button>
+    </div>
+    <nav class="nav flex-column px-2" role="navigation" aria-label="Primary">
+      <div class="nav-section text-uppercase text-muted small px-2">Overview</div>
+            <a class="nav-link active" asp-area="Admin" asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i><span>Dashboard</span></a>
+
+      <div class="nav-section text-uppercase text-muted small px-2 mt-3">People</div>
+            <a class="nav-link" asp-area="Admin" asp-controller="ManageAdmin" asp-action="Index"><i class="bi bi-people me-2"></i><span>Admins</span></a>
+
+            <a class="nav-link" asp-area="Admin" asp-controller="Application" asp-action="Index"><i class="bi bi-people me-2"></i><span>Applications</span></a>
+            <a class="nav-link" asp-area="Admin" asp-controller="UniversityStudent" asp-action="Index"><i class="bi bi-person-badge me-2"></i><span>Students</span></a>
+      <a class="nav-link" asp-area="Admin" asp-controller="Doctor" asp-action="Index"><i class="bi bi-person-video3 me-2"></i><span>Doctors</span></a>
+      <a class="nav-link" asp-area="Admin" asp-controller="Assistant" asp-action="Index"><i class="bi bi-person-workspace me-2"></i><span>Assistants</span></a>
+            <a class="nav-link" asp-area="Admin" asp-controller="Instructor" asp-action="Index"><i class="bi bi-person-workspace me-2"></i><span>Instructors</span></a>
+            <a class="nav-link" asp-area="Admin" asp-controller="ExternalStudent" asp-action="Index"><i class="bi bi-person-lines-fill me-2"></i><span>Non-Students</span></a>
+
+      <div class="nav-section text-uppercase text-muted small px-2 mt-3">Academics</div>
+      <a class="nav-link" asp-area="Admin" asp-controller="Department" asp-action="Index"><i class="bi bi-diagram-3 me-2"></i><span>Departments</span></a>
+      <a class="nav-link" asp-area="Admin" asp-controller="Course" asp-action="Index"><i class="bi bi-journal-text me-2"></i><span>Courses</span></a>
+            <a class="nav-link" asp-area="Admin" asp-controller="OptionalCourse" asp-action="Index"><i class="bi bi-journal-text me-2"></i><span>Optional Courses</span></a>
+            <a class="nav-link" asp-area="Admin" asp-controller="PromoCode" asp-action="Index"><i class="bi bi-journal-text me-2"></i><span>PromoCodes</span></a>
+      <a class="nav-link" asp-area="Admin" asp-controller="Sections" asp-action="Index"><i class="bi bi-grid-3x3-gap me-2"></i><span>Sections</span></a>
+      <a class="nav-link" asp-area="Admin" asp-controller="Scheduling" asp-action="Index"><i class="bi bi-calendar-week me-2"></i><span>Scheduling</span></a>
+
+      <div class="nav-section text-uppercase text-muted small px-2 mt-3">System</div>
+            <a class="nav-link" asp-area="Admin" asp-controller="SupportTicket" asp-action="Index"><i class="bi bi-door-open me-2"></i><span>Support Tickets</span></a>
+      <a class="nav-link" asp-area="Admin" asp-controller="Finance" asp-action="Index"><i class="bi bi-cash-coin me-2"></i><span>Finance</span></a>
+      <a class="nav-link" asp-area="Admin" asp-controller="Reports" asp-action="Index"><i class="bi bi-bar-chart-line me-2"></i><span>Reports</span></a>
+      <a class="nav-link" asp-area="Admin" asp-controller="Settings" asp-action="Index"><i class="bi bi-gear-wide-connected me-2"></i><span>Settings</span></a>
+    </nav>
+    <div class="mt-auto p-3 border-top small">
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="text-muted">v1.0</div>
+        <button id="themeToggle" class="btn btn-sm btn-outline-secondary" aria-label="Toggle theme">
+          <i class="bi bi-moon-stars"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content-wrapper">
+    <header class="topbar d-flex align-items-center justify-content-between px-3">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-secondary d-lg-none" id="mobileMenuBtn" aria-label="Toggle menu"><i class="bi bi-list"></i></button>
+        <div class="fw-semibold">DashBoard</div>
+      </div>
+      <form class="d-none d-md-flex" role="search" aria-label="Site search">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input class="form-control" type="search" placeholder="Search users, courses, ..." />
+        </div>
+      </form>
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-secondary position-relative" aria-label="Notifications">
+          <i class="bi bi-bell"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+        </button>
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
+            <img src="https://api.dicebear.com/7.x/initials/svg?seed=SA" width="24" height="24" class="rounded-circle" />
+            <span>Super Admin</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/Account/ProfileSetting/Index"><i class="bi bi-person me-2"></i> Profile</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-house me-2"></i> Go to site</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/identity/account/logout"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-header px-3 py-3">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h1 class="h4 mb-0">@ViewData["Title"]</h1>
+          @RenderSection("Breadcrumb", required: false)
+        </div>
+        <div class="d-flex gap-2">
+          @RenderSection("PageActions", required: false)
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT PLACEHOLDER -->
+    <main id="mainContent" class="container-fluid py-3">
+        @RenderBody()
+    </main>
+
+    <footer class="px-3 py-4 small text-muted text-center">© 2025 SmartUniversitySystem · All rights reserved.</footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="~/js/admin.js" asp-append-version="true"></script>
+
+    <!-- JQuery (لو مش موجود أصلاً) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
