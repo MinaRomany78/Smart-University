@@ -17,6 +17,7 @@ namespace SmartUniversity.Areas.Account.Controllers
         }
         public async Task<IActionResult> Index()
         {
+            // trying
             var user = await _userManager.GetUserAsync(User);
 
             if ( user is null)
