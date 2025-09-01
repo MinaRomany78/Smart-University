@@ -60,11 +60,12 @@ namespace SmartUniversity.Areas.Identity.Controllers
                 Student Profile
             </div>
             <div style='padding:20px;'>
+                <p>Welcome to Smart University!</p>
                 <p><strong>National ID:</strong> {student.NationalID}</p>
                 <p><strong>Name:</strong> {identityUser!.FullName}</p>
                 <p><strong>Email:</strong> {identityUser.Email}</p>
-                <p><strong>PassWord:</strong> Pa$$w0rd!</p>
-                
+                <p><b>Your password:</b> {applicationData.GeneratedPassword}</p>
+                <p>Please change your password after your first login.</p>
             </div>
         </div>";
 

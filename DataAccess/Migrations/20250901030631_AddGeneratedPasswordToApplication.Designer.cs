@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250901030631_AddGeneratedPasswordToApplication")]
+    partial class AddGeneratedPasswordToApplication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,9 +50,6 @@ namespace DataAccess.Migrations
 
                     b.Property<bool>("GenerateEmail")
                         .HasColumnType("bit");
-
-                    b.Property<string>("GeneratedPassword")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -148,7 +148,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f43d30b6-b811-45c8-854d-52a77ef2d73e",
+                            ConcurrencyStamp = "01b27671-9e79-41b7-bad0-dc08e9fa0188",
                             Email = "ahmed@test.com",
                             EmailConfirmed = true,
                             FirstName = "Ahmed",
@@ -159,7 +159,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "AHMED@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "cb7aed14-9d95-45d5-9780-7d987b6b47f2",
+                            SecurityStamp = "7acbfc7e-fb12-4851-a5c2-b5cebf0959f0",
                             TwoFactorEnabled = false,
                             UserName = "ahmed@test.com"
                         },
@@ -167,7 +167,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-101",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4145be88-c73a-48d7-9fa2-3239b632f4c4",
+                            ConcurrencyStamp = "aff4706c-662e-4711-afbd-784eae41ac1f",
                             Email = "mona@test.com",
                             EmailConfirmed = true,
                             FirstName = "Mona",
@@ -178,7 +178,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "MONA@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2cf54af2-3960-437c-954c-547a34e8bd62",
+                            SecurityStamp = "6ef5afe8-66e8-4398-ad5c-f8c10574ce78",
                             TwoFactorEnabled = false,
                             UserName = "mona@test.com"
                         },
@@ -186,7 +186,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-102",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0c565358-697f-48b0-918c-4054c02f70ff",
+                            ConcurrencyStamp = "ac04df0a-8f25-45a9-9cb7-9d8d14111f54",
                             Email = "hossam@test.com",
                             EmailConfirmed = true,
                             FirstName = "Hossam",
@@ -197,7 +197,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "HOSSAM@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9a35de28-f126-4f95-9229-990fd4ab773e",
+                            SecurityStamp = "b7fe14d8-31a5-4038-94e8-1abfab001785",
                             TwoFactorEnabled = false,
                             UserName = "hossam@test.com"
                         },
@@ -205,7 +205,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-103",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "16ae69b7-5308-41a7-b355-61aac77e9a7a",
+                            ConcurrencyStamp = "34a358c6-0876-4734-aa68-3639212d6275",
                             Email = "sara@test.com",
                             EmailConfirmed = true,
                             FirstName = "Sara",
@@ -216,7 +216,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "SARA@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5f78e65f-8c17-463c-9aa5-d51db455966c",
+                            SecurityStamp = "6a85f77e-9074-49f0-b6b0-287e24d6fc23",
                             TwoFactorEnabled = false,
                             UserName = "sara@test.com"
                         },
@@ -224,7 +224,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-104",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8be74b2b-e4b9-42a7-b9d6-d71239a952e0",
+                            ConcurrencyStamp = "891f02a7-fbcb-46fe-b361-7b3064485d73",
                             Email = "khaled@test.com",
                             EmailConfirmed = true,
                             FirstName = "Khaled",
@@ -235,7 +235,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "KHALED@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b55cbbe9-8e7f-4dff-8c3c-59989d92cce2",
+                            SecurityStamp = "02b49736-62c4-4d7e-8936-f28bba745ce3",
                             TwoFactorEnabled = false,
                             UserName = "khaled@test.com"
                         });
@@ -1987,6 +1987,9 @@ namespace DataAccess.Migrations
 
                     b.Property<int>("DepartmentID")
                         .HasColumnType("int");
+
+                    b.Property<string>("GeneratedPassword")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsUniversityStudent")
                         .HasColumnType("bit");

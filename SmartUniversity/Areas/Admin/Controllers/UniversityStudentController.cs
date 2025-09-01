@@ -3,6 +3,7 @@ using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
@@ -17,11 +18,13 @@ namespace SmartUniversity.Areas.Admin.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        public UniversityStudentController(IUnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        private readonly IEmailSender _emailSender;
+        public UniversityStudentController(IUnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
         {
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
        
         public async Task<IActionResult> Index(int page = 1)
@@ -71,40 +74,35 @@ namespace SmartUniversity.Areas.Admin.Controllers
             return View(vm);
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Create(AdminUniversityStudentVM vm)
         {
             if (!ModelState.IsValid)
-            {
-                vm.DepartMentList = (await _unitOfWork.Departments.GetAsync())
-                 .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name })
-                 .ToList();
+            { vm.DepartMentList = (await _unitOfWork.Departments.GetAsync()).Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name }).ToList();
 
-                vm.TermList = (await _unitOfWork.Terms.GetAsync())
-                    .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
-                    .ToList();
+                vm.TermList = (await _unitOfWork.Terms.GetAsync()).Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name }).ToList();
                 return View(vm);
-            }
+            } 
+
+            var universityEmail = GenerateUniversityEmail(vm.FirstName, vm.LastName);
+            var password = GeneratePassword();
 
             var user = new ApplicationUser
             {
-                UserName = vm.UserName,
+                UserName = universityEmail,
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,
-                FullName=vm.FirstName+vm.LastName,
-                Email = vm.Email,
-                EmailConfirmed=vm.IsEmailConfirmed,
-
+                FullName = vm.FirstName + " " + vm.LastName,
+                Email = universityEmail,
+                EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(user, "Pass123+");
-            
+            var result = await _userManager.CreateAsync(user, password);
+
             if (!result.Succeeded)
             {
-               
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError("", error.Description);
-
+                foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
                 return View(vm);
             }
 
@@ -112,25 +110,36 @@ namespace SmartUniversity.Areas.Admin.Controllers
             {
                 ApplicationUserId = user.Id,
                 NationalID = vm.NationalId,
-                IsUniversityStudent=true,
+                IsUniversityStudent = true,
                 DepartmentID = vm.DepartmentId,
                 TermId = vm.TermId
-
             };
+
             await _userManager.AddToRoleAsync(user, SD.UniversityStudent);
 
             await _unitOfWork.Students.CreateAsync(student);
-           var updateStudent =await _unitOfWork.Applications.GetOneAsync(e=>e.NationalID==student.NationalID);
-            
+
+            var updateStudent = await _unitOfWork.Applications.GetOneAsync(e => e.NationalID == student.NationalID);
+
             updateStudent!.GenerateEmail = true;
-
+            updateStudent!.GeneratedPassword = password;
             await _unitOfWork.Applications.UpdateAsync(updateStudent);
+            await _unitOfWork.Applications.CommitAsync();
             await _unitOfWork.Students.CommitAsync();
+
+            //await _emailSender.SendEmailAsync(
+            //    updateStudent.Email,
+            //    "Your Smart University Account",
+            //    $"<p>Welcome to Smart University!</p>" +
+            //    $"<p><b>Your university email:</b> {universityEmail}</p>" +
+            //    $"<p><b>Your password:</b> {password}</p>" +
+            //    $"<p>Please change your password after your first login.</p>"
+            //    );
+
             TempData["success-notification"] = "User Created successfully!";
-
-
-            return RedirectToAction(nameof(Index), "UniversityStudent", new {area="Admin"});
+            return RedirectToAction(nameof(Index), "UniversityStudent", new { area = "Admin" }); 
         }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -145,11 +154,8 @@ namespace SmartUniversity.Areas.Admin.Controllers
             {
                 Id = student.Id,
                 NationalId = student.NationalID,
-                UserName = student!.ApplicationUser.UserName??"",
                 FirstName = student.ApplicationUser.FirstName,
                 LastName = student.ApplicationUser.LastName,
-                Email = student!.ApplicationUser.Email??"",
-                IsEmailConfirmed = student.ApplicationUser.EmailConfirmed,
                 DepartmentId = student.DepartmentID,   
                 TermId = student.TermId,
                 DepartMentList = (await _unitOfWork.Departments.GetAsync())
@@ -192,12 +198,9 @@ namespace SmartUniversity.Areas.Admin.Controllers
 
             // Update ApplicationUser
             var user = student.ApplicationUser;
-            user.UserName = vm.UserName;
             user.FirstName = vm.FirstName;
             user.LastName = vm.LastName;
             user.FullName = vm.FirstName + " " + vm.LastName;
-            user.Email = vm.Email;
-            user.EmailConfirmed = vm.IsEmailConfirmed;
 
             await _userManager.UpdateAsync(user);
 
@@ -229,5 +232,41 @@ namespace SmartUniversity.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index), "UniversityStudent", new { area = "Admin" });
         }
 
+        private string GenerateUniversityEmail(string firstName, string lastName, string nationalId = "")
+        {
+            string first = firstName.Length >= 2 ? firstName.Substring(0, 2).ToLower() : firstName.ToLower();
+            string last = lastName.ToLower();
+            string unique = !string.IsNullOrEmpty(nationalId) ? nationalId.Substring(nationalId.Length - 3) : new Random().Next(100, 999).ToString();
+            return $"{first}{last}{unique}@smart-university.eg";
+        }
+
+        private string GeneratePassword(int length = 10)
+        {
+            const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lower = "abcdefghijklmnopqrstuvwxyz";
+            const string digits = "0123456789";
+            const string special = "!@#$%";
+
+            var random = new Random();
+
+            // لازم نضمن إن الباسورد فيه كل حاجة
+            var password = new List<char>
+            {
+                upper[random.Next(upper.Length)],
+                lower[random.Next(lower.Length)],
+                digits[random.Next(digits.Length)],
+                special[random.Next(special.Length)]
+            };
+
+            // نكمل لحد الطول المطلوب
+            string allChars = upper + lower + digits + special;
+            for (int i = password.Count; i < length; i++)
+            {
+                password.Add(allChars[random.Next(allChars.Length)]);
+            }
+
+            // Shuffle
+            return new string(password.OrderBy(_ => random.Next()).ToArray());
+        }
     }
 }
