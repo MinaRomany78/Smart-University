@@ -16,6 +16,7 @@ namespace Entities.Models
         public string AuthorId { get; set; } = string.Empty;
         [ForeignKey(nameof(AuthorId))]
         public ApplicationUser Author { get; set; } = null!;
+        
         public string Content { get; set; } = string.Empty;
         public DateTime PostDate { get; set; }
         public ICollection<Comment> Comments { get; } = new List<Comment>();

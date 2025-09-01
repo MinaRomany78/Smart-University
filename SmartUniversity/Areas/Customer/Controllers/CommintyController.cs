@@ -64,14 +64,13 @@ namespace SmartUniversity.Areas.Customer.Controllers
             await _unitOfWork.CommunityPosts.CreateAsync(post);
             await _unitOfWork.CommunityPosts.CommitAsync();
 
-            // 🔹 إنشاء مجلد uploads إذا لم يكن موجود
             var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
             if (!Directory.Exists(uploadDir))
             {
                 Directory.CreateDirectory(uploadDir);
             }
 
-            // 🔹 رفع الملفات
+            
             if (vm.Files != null && vm.Files.Any())
             {
                 foreach (var file in vm.Files)
@@ -113,5 +112,110 @@ namespace SmartUniversity.Areas.Customer.Controllers
             TempData["success-notification"] = "Post created successfully!";
             return RedirectToAction("Index", new { courseId = vm.CourseId });
         }
+        [HttpPost]
+      [Authorize]
+        public async Task<IActionResult> AddComment(int postId, string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                TempData["error-notification"] = "Comment cannot be empty.";
+                return RedirectToAction("Index");
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized();
+
+            var comment = new Comment
+            {
+                PostID = postId,
+                Content = content,
+                AuthorId = user.Id,
+                DatePosted = DateTime.Now
+            };
+
+            await _unitOfWork.Comments.CreateAsync(comment);
+            await _unitOfWork.Comments.CommitAsync();
+
+            // عشان نرجع لنفس الكورس اللي فيه البوست
+            var post = await _unitOfWork.CommunityPosts.GetOneAsync(e=>e.Id==postId);
+                    if (post == null)
+                        return NotFound();
+
+            TempData["success-notification"] = "Comment added successfully!";
+            return RedirectToAction("Index", new { courseId = post.CourseID});
+        }
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> DeletePost(int postId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var post = await _unitOfWork.CommunityPosts.GetOneAsync(p => p.Id == postId);
+            if (post == null) return NotFound();
+
+            if (post.AuthorId != user.Id)
+                return Forbid();
+
+            var files = await _unitOfWork.PostFiles.GetAsync(f => f.PostId == postId);
+            foreach (var file in files)
+            {
+                var physicalPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file.FilePath.TrimStart('/'));
+                if (System.IO.File.Exists(physicalPath))
+                {
+                    System.IO.File.Delete(physicalPath);
+                }
+                await _unitOfWork.PostFiles.DeleteAsync(file);
+            }
+
+            var links = await _unitOfWork.PostLinks.GetAsync(l => l.PostId == postId);
+            foreach (var link in links)
+            {
+                await _unitOfWork.PostLinks.DeleteAsync(link);
+            }
+
+            // مسح الكومنتات المرتبطة
+            var comments = await _unitOfWork.Comments.GetAsync(c => c.PostID == postId);
+            foreach (var comment in comments)
+            {
+                await _unitOfWork.Comments.DeleteAsync(comment);
+            }
+
+            // في الآخر نمسح البوست نفسه
+            await _unitOfWork.CommunityPosts.DeleteAsync(post);
+            await _unitOfWork.CommunityPosts.CommitAsync();
+
+            TempData["success-notification"] = "Post deleted successfully!";
+            return RedirectToAction("Index", new { courseId = post.CourseID });
+
+        }
+            [HttpPost]
+            [Authorize]
+            public async Task<IActionResult> DeleteComment(int commentId)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return Unauthorized();
+
+                var comment = await _unitOfWork.Comments.GetOneAsync(c => c.Id == commentId);
+                if (comment == null) return NotFound();
+
+                if (comment.AuthorId != user.Id)
+                    return Forbid();
+
+                // 🔹 هات البوست عشان تجيب CourseID
+                var post = await _unitOfWork.CommunityPosts.GetOneAsync(p => p.Id == comment.PostID);
+                if (post == null) return NotFound();
+
+                await _unitOfWork.Comments.DeleteAsync(comment);
+                await _unitOfWork.Comments.CommitAsync();
+
+                TempData["success-notification"] = "Comment deleted successfully!";
+                return RedirectToAction("Index", new { courseId = post.CourseID });
+            }
+
+
+
+
+        }
     }
-}

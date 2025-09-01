@@ -1,4 +1,7 @@
-﻿@model Entities.ViewModel.CommunityVM
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+@model Entities.ViewModel.CommunityVM
 @{
     ViewData["Title"] = "Community";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -56,7 +59,7 @@
                                 <i class="bi bi-paperclip"></i> Files / Images
                             </button>
                             <input type="file" id="filesInput" name="Files" multiple
-                                   accept="image/*,application/pdf,.doc,.docx" class="d-none" />
+                                   accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.mp4,.webm" class="d-none" />
                             <input type="text" name="Link" class="form-control" placeholder="Add a link..." style="max-width: 200px;" />
                         </div>
 
@@ -83,8 +86,30 @@
                             <h6 class="fw-bold mb-0">@post.Author?.UserName </h6>
                             <small class="text-muted time-stamp">@post.PostDate.ToString("MMM dd, yyyy HH:mm")</small>
                         </div>
+
+                        @if (post.AuthorId == UserManager.GetUserId(User))   // ✅ Dropdown بدل الزرار
+                        {
+                            <div class="ms-auto dropdown">
+                                <button class="btn btn-sm btn-link text-muted dropdown-toggle-no-caret" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <form asp-action="DeletePost" method="post">
+                                            <input type="hidden" name="postId" value="@post.Id" />
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-trash me-2"></i> Delete Post
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
                     </div>
+
                     <p class="mt-2 mb-3">@post.Content</p>
+
+                    @* ملفات البوست *@
                     @if (post.Files != null && post.Files.Any())
                     {
                         <div class="mb-2 d-flex flex-wrap gap-2">
@@ -96,13 +121,20 @@
                                 {
                                     <img src="@file.FilePath" alt="@System.IO.Path.GetFileName(file.FilePath)"
                                          style="max-width:150px; border-radius:8px; cursor:pointer;"
-                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-file="@file.FilePath" />
+                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-type="image" data-file="@file.FilePath" />
                                 }
                                 else if (extension == ".pdf")
                                 {
                                     <div style="width:150px; height:200px; border:1px solid #ddd; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer;"
-                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-file="@file.FilePath">
+                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-type="pdf" data-file="@file.FilePath">
                                         <i class="bi bi-file-earmark-pdf fs-2 text-danger"></i>
+                                    </div>
+                                }
+                                else if (extension == ".mp4" || extension == ".webm" || extension == ".ogg")
+                                {
+                                    <div style="width:150px; height:100px; border:1px solid #ddd; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer;"
+                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-type="video" data-file="@file.FilePath">
+                                        <i class="bi bi-film fs-2 text-primary"></i>
                                     </div>
                                 }
                                 else
@@ -113,9 +145,7 @@
                         </div>
                     }
 
-
-                    
-
+                    @* روابط *@
                     @if (post.Links != null && post.Links.Any())
                     {
                         <div class="mb-2">
@@ -127,7 +157,10 @@
                     }
 
                     <hr />
-                    <h6 class="fw-semibold text-muted mb-3">Comments</h6>
+                    <h6 class="fw-semibold text-muted mb-3">
+                        Comments
+                        <span class="badge bg-light text-muted ms-1">@post.Comments?.Count() </span>
+                    </h6>
 
                     @if (post.Comments != null && post.Comments.Any())
                     {
@@ -141,6 +174,25 @@
                                     <b>@(comment.Author?.UserName ?? "Anonymous")</b>
                                     <p class="mb-1">@comment.Content</p>
                                     <small class="text-muted time-stamp">@comment.DatePosted.ToString("MMM dd, yyyy HH:mm")</small>
+
+                                    @if (comment.AuthorId == UserManager.GetUserId(User))   
+                                    {
+                                        <div class="dropdown d-inline ms-2">
+                                            <button class="btn btn-sm btn-link text-muted dropdown-toggle-no-caret" type="button" data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <form asp-action="DeleteComment" method="post">
+                                                        <input type="hidden" name="commentId" value="@comment.Id" />
+                                                        <button type="submit" class="dropdown-item text-danger">
+                                                            <i class="bi bi-trash me-2"></i> Delete Comment
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         }
@@ -172,6 +224,8 @@
         </div>
     }
 </div>
+
+<!-- File Preview Modal -->
 <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -185,41 +239,75 @@
 
 @section Scripts {
     <script>
-        const btnSelectFiles = document.getElementById("btnSelectFiles");
-        const filesInput = document.getElementById("filesInput");
-        const selectedFilesDiv = document.getElementById("selectedFiles");
+        // زرار يفتح الـ file input
+        document.getElementById("btnSelectFiles").addEventListener("click", function () {
+            document.getElementById("filesInput").click();
+        });
 
-        btnSelectFiles.addEventListener("click", () => filesInput.click());
-
-        filesInput.addEventListener("change", () => {
+        // عرض الملفات المختارة
+        document.getElementById("filesInput").addEventListener("change", function () {
+            const selectedFilesDiv = document.getElementById("selectedFiles");
             selectedFilesDiv.innerHTML = "";
-            const files = filesInput.files;
-            if (files.length > 0) {
-                const list = document.createElement("ul");
-                for (let i = 0; i < files.length; i++) {
-                    const li = document.createElement("li");
-                    li.textContent = files[i].name;
-                    list.appendChild(li);
+
+            for (let file of this.files) {
+                const fileDiv = document.createElement("div");
+                fileDiv.classList.add("mb-2", "d-flex", "align-items-center", "gap-2");
+
+                if (file.type.startsWith("image/")) {
+                    const img = document.createElement("img");
+                    img.src = URL.createObjectURL(file);
+                    img.style.maxWidth = "80px";
+                    img.style.maxHeight = "80px";
+                    img.style.borderRadius = "6px";
+                    img.style.objectFit = "cover";
+                    fileDiv.appendChild(img);
+                } else {
+                    const icon = document.createElement("i");
+                    icon.classList.add("bi", "bi-paperclip");
+                    fileDiv.appendChild(icon);
                 }
-                selectedFilesDiv.appendChild(list);
+
+                const nameSpan = document.createElement("span");
+                nameSpan.textContent = file.name;
+                fileDiv.appendChild(nameSpan);
+
+                selectedFilesDiv.appendChild(fileDiv);
             }
         });
-                const previewModal = document.getElementById('filePreviewModal');
+
+        // Preview Modal
+        const previewModal = document.getElementById('filePreviewModal');
         const previewIframe = document.getElementById('previewIframe');
 
         previewModal.addEventListener('show.bs.modal', function (event) {
             const trigger = event.relatedTarget;
             const fileUrl = trigger.getAttribute('data-file');
-            previewIframe.src = fileUrl;
+            const fileType = trigger.getAttribute('data-type');
+
+            if (fileType === "image" || fileType === "pdf") {
+                previewIframe.style.display = "block";
+                previewIframe.src = fileUrl;
+            }
+            else if (fileType === "video") {
+                previewIframe.style.display = "none";
+                previewIframe.insertAdjacentHTML("afterend",
+                    `<video id="previewVideo" src="${fileUrl}" controls autoplay style="width:100%; height:90vh; border:none;"></video>`
+                );
+            }
+            else if (fileType === "doc") {
+                previewIframe.style.display = "block";
+                previewIframe.src = "https://docs.google.com/gview?url=" + encodeURIComponent(fileUrl) + "&embedded=true";
+            }
         });
 
         previewModal.addEventListener('hidden.bs.modal', function () {
             previewIframe.src = "";
+            previewIframe.style.display = "block";
+            const video = document.getElementById("previewVideo");
+            if (video) video.remove();
         });
     </script>
 }
-
-
 
 @section Styles {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
@@ -268,11 +356,6 @@
             padding: 10px 18px;
         }
 
-            .post-input:focus, .comment-input:focus {
-                box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
-                border-color: var(--primary-color);
-            }
-
         .btn-post {
             border-radius: 50px;
             padding: 10px 24px;
@@ -305,6 +388,11 @@
 
         .time-stamp {
             font-size: 0.8rem;
+        }
+
+        /* 🔹 Dropdown بدون caret */
+        .dropdown-toggle-no-caret::after {
+            display: none !important;
         }
     </style>
 }
