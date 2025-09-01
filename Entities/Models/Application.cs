@@ -25,6 +25,5 @@ namespace Entities.Models
         [Required]
         public bool GenerateEmail { get; set; } = false;
         public string? GeneratedPassword { get; set; }
-
     }
 }

@@ -90,11 +90,11 @@ namespace SmartUniversity.Areas.Admin.Controllers
 
             var user = new ApplicationUser
             {
-                UserName = universityEmail,
+                UserName = universityEmail.UserName,
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,
                 FullName = vm.FirstName + " " + vm.LastName,
-                Email = universityEmail,
+                Email = universityEmail.Email,
                 EmailConfirmed = true
             };
 
@@ -232,12 +232,14 @@ namespace SmartUniversity.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index), "UniversityStudent", new { area = "Admin" });
         }
 
-        private string GenerateUniversityEmail(string firstName, string lastName, string nationalId = "")
+        private (string UserName, string Email) GenerateUniversityEmail(string firstName, string lastName, string nationalId = "")
         {
             string first = firstName.Length >= 2 ? firstName.Substring(0, 2).ToLower() : firstName.ToLower();
             string last = lastName.ToLower();
             string unique = !string.IsNullOrEmpty(nationalId) ? nationalId.Substring(nationalId.Length - 3) : new Random().Next(100, 999).ToString();
-            return $"{first}{last}{unique}@smart-university.eg";
+            string userName = $"{first}{last}{unique}";
+            string email = $"{userName}@smart-university.eg";
+            return (userName, email);
         }
 
         private string GeneratePassword(int length = 10)
