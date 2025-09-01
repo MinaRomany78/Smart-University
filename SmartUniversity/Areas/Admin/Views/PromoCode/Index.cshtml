@@ -59,9 +59,10 @@
                 <tr>
                     <th>Code</th>
                     <th>Discount (%)</th>
-                    <th>University Students Only</th>
+                    <th>Uni Students Only</th>
+                    <th>Max Usage</th>
                     <th>Assigned Students</th>
-                    <th>Optional Courses</th>
+                    <th>Status</th>
                     <th class="text-end">Actions</th>
                 </tr>
             </thead>
@@ -81,8 +82,18 @@
                                 <span class="badge bg-secondary">No</span>
                             }
                         </td>
-                        <td>@item.Students.Count()</td>
-                        <td>@item.OptionalCourses.Count()</td>
+                        <td>@item.MaxUsage</td>
+                        <td>@item.CurrentUsage</td>
+                        <td>
+                            @if (item.IsExpired)
+                            {
+                                <span class="badge bg-danger">Expired</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">Active</span>
+                            }
+                        </td>
                         <td class="table-actions">
                             <a href="@Url.Action("Edit", "PromoCode", new { id = item.Code, area = "Admin" })"
                                class="btn btn-warning btn-sm me-1" title="Edit">

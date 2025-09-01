@@ -53,6 +53,8 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 return View(promoCode);
             }
 
+            promoCode.CurrentUsage = 0;
+
             await _unitOfWork.PromoCodes.CreateAsync(promoCode);
             await _unitOfWork.PromoCodes.CommitAsync();
 
@@ -99,9 +101,23 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 return NotFound();
 
             if (!ModelState.IsValid)
+            {
+                var oCourses = await _unitOfWork.OptionalCourses.GetAsync();
+                ViewBag.oCourses = oCourses;
+                ViewBag.SelectedCourses = selectedCourses;
                 return View(promoCode);
+            }
 
-            await _unitOfWork.PromoCodes.UpdateAsync(promoCode);
+            var existingPromo = await _unitOfWork.PromoCodes.GetOneAsync(e => e.Code == id);
+            if (existingPromo == null)
+                return NotFound();
+
+            existingPromo.DiscountPercent = promoCode.DiscountPercent;
+            existingPromo.IsForUniversityStudentsOnly = promoCode.IsForUniversityStudentsOnly;
+            existingPromo.MaxUsage = promoCode.MaxUsage;
+
+
+            await _unitOfWork.PromoCodes.UpdateAsync(existingPromo);
 
             var ocourses = await _unitOfWork.OptionalCourses.GetAsync();
             foreach (var course in ocourses)
