@@ -132,6 +132,13 @@ namespace DataAccess.Data
                 .HasForeignKey(r => r.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<CommunityPost>()
+                .HasOne(p => p.Author)
+                .WithMany()
+                .HasForeignKey(p => p.AuthorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
 
             // Feedback ↔ Student (cascade ممكن نسيبها)
             builder.Entity<Feedback>()

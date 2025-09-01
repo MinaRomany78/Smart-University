@@ -17,7 +17,6 @@ namespace SmartUniversity.Areas.Account.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            // trying
             var user = await _userManager.GetUserAsync(User);
 
             if ( user is null)
@@ -54,8 +53,6 @@ namespace SmartUniversity.Areas.Account.Controllers
             user.FirstName = editProfileVM.FirstName;
             user.LastName = editProfileVM.LastName;
             user.FullName = $"{editProfileVM.FirstName} {editProfileVM.LastName}";
-            user.UserName = editProfileVM.UserName;
-            user.Email = editProfileVM.Email;
             user.Address = editProfileVM.Address;
 
             await _userManager.UpdateAsync(user);

@@ -64,7 +64,8 @@ namespace SmartUniversity.Areas.Identity.Controllers
                 <p><strong>National ID:</strong> {student.NationalID}</p>
                 <p><strong>Name:</strong> {identityUser!.FullName}</p>
                 <p><strong>Email:</strong> {identityUser.Email}</p>
-                <p><b>Your password:</b> {applicationData.GeneratedPassword}</p>
+                <p><b>User Name:</b> {identityUser.UserName}</p>
+                <p><b>password:</b> {applicationData.GeneratedPassword}</p>
                 <p>Please change your password after your first login.</p>
             </div>
         </div>";
