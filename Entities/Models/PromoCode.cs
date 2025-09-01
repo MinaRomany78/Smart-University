@@ -14,6 +14,9 @@ namespace Entities.Models
         public string Code { get; set; } = null!;
         public decimal DiscountPercent { get; set; }
         public bool IsForUniversityStudentsOnly { get; set; }
+        public int MaxUsage { get; set; }
+        public int CurrentUsage { get; set; } = 0;
+        public bool IsExpired => CurrentUsage >= MaxUsage;
         [NotMapped]
         public string DisplayText => $"{Code} - {DiscountPercent}%";
         public ICollection<Student> Students { get; } = new List<Student>();

@@ -49,12 +49,9 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 e => e.ApplicationUser
             });
 
-            var promoCodes = await _unitOfWork.PromoCodes.GetAsync();
-
             var vm = new OptionalCourseVM
             {
                 Instructors = instructors.ToList(),
-                PromoCodes = promoCodes.ToList()
             };
 
             return View(vm);
@@ -72,8 +69,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     e => e.ApplicationUser
                 })).ToList();
 
-                vm.PromoCodes = (await _unitOfWork.PromoCodes.GetAsync()).ToList();
-
                 return View(vm);
             }
 
@@ -82,10 +77,16 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 Name = vm.Name,
                 Description = vm.Description,
                 Price = vm.Price,
-                PromoCode = vm.PromoCode,
                 IsAvailableForUniversityStudents = vm.IsAvailableForUniversityStudents,
                 InstructorId = vm.InstructorId
             };
+
+            var promoCode = await _unitOfWork.PromoCodes.GetOneAsync(e => e.OptionalCourses.Any(e => e.Id == oCourse.Id));
+
+            if (promoCode is not null)
+            {
+                oCourse.PromoCode = promoCode.Code;
+            }
 
             if (vm.MainImg is not null && vm.MainImg.Length > 0)
             {
@@ -124,18 +125,14 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 e => e.ApplicationUser
             });
 
-            var promoCodes = await _unitOfWork.PromoCodes.GetAsync();
-
             var vm = new OptionalCourseVM
             {
                 Name = oCourse.Name,
                 Description = oCourse.Description,
                 Price = oCourse.Price,
                 IsAvailableForUniversityStudents = oCourse.IsAvailableForUniversityStudents,
-                PromoCode = oCourse.PromoCode,
                 InstructorId = oCourse.InstructorId,
                 Instructors = instructors.ToList(),
-                PromoCodes = promoCodes.ToList()
             };
 
             ViewBag.mainImg = oCourse.MainImg;
@@ -154,8 +151,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     e => e.ApplicationUser
                 })).ToList();
 
-                vm.PromoCodes = (await _unitOfWork.PromoCodes.GetAsync()).ToList();
-
                 return View(vm);
             }
 
@@ -167,7 +162,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             oCourse.Name = vm.Name;
             oCourse.Description = vm.Description;
             oCourse.Price = vm.Price;
-            oCourse.PromoCode = vm.PromoCode;
             oCourse.IsAvailableForUniversityStudents = vm.IsAvailableForUniversityStudents;
             oCourse.InstructorId = vm.InstructorId;
 

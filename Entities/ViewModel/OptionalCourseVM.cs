@@ -18,11 +18,9 @@ namespace Entities.ViewModel
         [Required]
         public decimal Price { get; set; }
         public bool IsAvailableForUniversityStudents { get; set; }
-        public string? PromoCode { get; set; }
         [Required]
         public int InstructorId { get; set; }
         public IFormFile? MainImg { get; set; }
         public List<Instructor> Instructors { get; set; } = new List<Instructor>();
-        public List<PromoCode> PromoCodes { get; set; } = new List<PromoCode>();
     }
 }

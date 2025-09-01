@@ -48,16 +48,6 @@
                          style="display:none; margin-top:10px; max-width:200px; border-radius:8px;" />
                 </div>
 
-                <!-- Promo Code -->
-                <div class="mb-3">
-                    <label class="fw-bold">PromoCode</label>
-                    <select asp-for="PromoCode"
-                            asp-items="@(new SelectList(Model.PromoCodes, "Code", "DisplayText", Model.PromoCode))"
-                            class="form-select">
-                        <option value="">-- Select PromoCode --</option>
-                    </select>
-                </div>
-
                 <!-- Availability -->
                 <div class="form-check mb-3">
                     <input asp-for="IsAvailableForUniversityStudents" class="form-check-input" />
