@@ -4,6 +4,20 @@
     ViewData["Title"] = "Create University Student";
 }
 
+@if (TempData["error-notification"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["error-notification"]
+    </div>
+}
+@if (TempData["success-notification"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["success-notification"]
+    </div>
+}
+
+
 <div class="container mt-4">
     <div class="card shadow-sm rounded-3">
         <div class="card-header bg-primary text-white">
@@ -33,27 +47,6 @@
                         <span asp-validation-for="LastName" class="text-danger"></span>
                     </div>
 
-                    <!-- User Name -->
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="UserName" class="form-label"></label>
-                        <input asp-for="UserName" class="form-control" />
-                        <span asp-validation-for="UserName" class="text-danger"></span>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <!-- Email Confirmed -->
-                    <div class="col-md-6 mb-3 d-flex align-items-center">
-                        <div class="form-check">
-                            <input asp-for="IsEmailConfirmed" class="form-check-input" type="checkbox" />
-                            <label asp-for="IsEmailConfirmed" class="form-check-label"></label>
-                        </div>
-                    </div>
                     <div class="mb-3">
                         <label asp-for="DepartmentId" class="form-label">Department</label>
                         <select asp-for="DepartmentId" asp-items="Model.DepartMentList" class="form-select">
@@ -87,4 +80,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
 }
