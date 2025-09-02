@@ -28,13 +28,21 @@ namespace SmartUniversity.Areas.Customer.Controllers
         {
             if(ModelState.IsValid)
             {
+                var exestingUser = await _unitOfWork.ApplicationUsers.GetOneAsync(e => e.Email == ticket.SenderEmail);
+                var exestingApplication = await _unitOfWork.Applications.GetOneAsync(e => e.Email == ticket.SenderEmail);
+                if (exestingUser is null && exestingApplication is null)
+                {
+                    ModelState.AddModelError(nameof(SupportTicket.SenderEmail), "This email is not registered in our system.");
+                    return View(ticket);
+                }
+
                 ticket.Status = TicketStatus.Open;
                 ticket.CreatedDate = DateTime.UtcNow;
 
                 await _unitOfWork.SupportTickets.CreateAsync(ticket);
                 await _unitOfWork.SupportTickets.CommitAsync();
 
-                TempData["success-notification"] = "Your ticket has been submitted, we mostly reply about 24 hours";
+                TempData["success-notification"] = "Your ticket has been submitted, we mostly reply within 24 hours";
                 return RedirectToAction("Index", "Home", new { area = "Identity" });
             }
             return View(ticket);
