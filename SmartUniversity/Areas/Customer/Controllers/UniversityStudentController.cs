@@ -51,7 +51,10 @@ namespace SmartUniversity.Areas.Customer.Controllers
                 e => e.TermId == student.TermId && e.DepartmentID == student.DepartmentID
             );
 
-            var registered = await _unitOfWork.Enrollments.GetAsync(e => e.StudentID == student.Id);
+            var registered = await _unitOfWork.Enrollments.GetAsync(
+                    e => e.StudentID == student.Id && e.UniversityCourse.TermId == student.TermId
+                );
+
             var registeredIds = registered.Select(e => e.UniversityCourseID).ToList();
             int alreadyRegisteredCredits = registered.Sum(e => e.CreditHours);
 
@@ -87,7 +90,10 @@ namespace SmartUniversity.Areas.Customer.Controllers
 
             SelectedCourses = SelectedCourses.Distinct().ToList();
 
-            var registered = await _unitOfWork.Enrollments.GetAsync(e => e.StudentID == student.Id);
+            var registered = await _unitOfWork.Enrollments.GetAsync(
+                e => e.StudentID == student.Id && e.UniversityCourse.TermId == student.TermId
+            );
+
             var registeredIds = registered.Select(e => e.UniversityCourseID).ToList();
             int alreadyRegisteredCredits = registered.Sum(e => e.CreditHours);
 
@@ -210,7 +216,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>(),
                 Mode = "payment",
-                SuccessUrl = $"{Request.Scheme}://{Request.Host}/Customer/Checkout/Success",
+                SuccessUrl = $"{Request.Scheme}://{Request.Host}/Customer/Checkout/Success?session_id={{CHECKOUT_SESSION_ID}}",
                 CancelUrl = $"{Request.Scheme}://{Request.Host}/Customer/Checkout/Cancel",
             };
 

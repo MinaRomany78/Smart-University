@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
-    [Area ("Customer")]
-    public class  ExternalStudentController : Controller
+    [Area("Customer")]
+    public class ExternalStudentController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -24,7 +24,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string? searchQuery)
         {
-            var courses = await _unitOfWork.OptionalCourses.GetAsync(include : new Expression<Func<OptionalCourse, object>>[]
+            var courses = await _unitOfWork.OptionalCourses.GetAsync(include: new Expression<Func<OptionalCourse, object>>[]
             {
                 e => e.Instructor,
                 e => e.Instructor.ApplicationUser
@@ -53,8 +53,11 @@ namespace SmartUniversity.Areas.Customer.Controllers
             if (oCourse is null)
                 return NotFound();
 
-            var topCourses = (await _unitOfWork.OptionalCourses.GetAsync(e => e.Id != id))
-                .OrderByDescending(e=> e.Traffic).Skip(0).Take(4);
+            var topCourses = (await _unitOfWork.OptionalCourses.GetAsync(e => e.Id != id, include: new Expression<Func<OptionalCourse, object>>[]
+            {
+                e => e.Instructor.ApplicationUser
+            }))
+                .OrderByDescending(e => e.Traffic).Skip(0).Take(4);
 
             oCourse.Traffic++;
             await _unitOfWork.OptionalCourses.CommitAsync();

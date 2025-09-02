@@ -15,5 +15,7 @@ namespace Entities.Models
         public ICollection<Comment> Comments { get; } = new List<Comment>();
         public ICollection<DoctorAssistant> DoctorAssistants { get; } = new List<DoctorAssistant>();
         public ICollection<AssistantCourse> AssistantCourses { get; } = new List<AssistantCourse>();
+        public ICollection<Material> Materials { get; } = new List<Material>();
+
     }
 }

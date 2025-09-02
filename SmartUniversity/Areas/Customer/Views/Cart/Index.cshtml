@@ -50,7 +50,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold text-gradient mb-0">Total: <span class="text-success">@Model.TotalPrice.ToString("C")</span></h4>
-            <form asp-action="Checkout" method="post" class="m-0">
+            <form asp-action="PayNow" method="post" class="m-0">
                 <button type="submit" class="btn btn-gradient rounded-pill px-4 py-2 shadow-sm fw-semibold">
                     Proceed to Checkout
                 </button>

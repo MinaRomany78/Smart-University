@@ -1,0 +1,34 @@
+﻿@model Entities.ViewModel.MaterialVM
+
+@{
+    ViewData["Title"] = "Add Material";
+    Layout = "~/Views/Shared/_CourseLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">➕ Add Material</h3>
+
+    <form asp-action="AddMaterial" method="post">
+        @* Hidden to keep Course ID *@
+        <input type="hidden" asp-for="UniversityCourseID" />
+
+        <div class="mb-3">
+            <label asp-for="MaterialLink" class="form-label">Material Link</label>
+            <input asp-for="MaterialLink" class="form-control" placeholder="Enter material link..." />
+            <span asp-validation-for="MaterialLink" class="text-danger"></span>
+        </div>
+
+        <div class="alert alert-info">
+            ⚡ Note:
+            - If you are logged in as <strong>Doctor</strong>, this will be saved as a <span class="text-primary">Lecture</span>.
+            - If you are logged in as <strong>Assistant</strong>, this will be saved as a <span class="text-success">Lab</span>.
+        </div>
+
+        <button type="submit" class="btn btn-success">✅ Save</button>
+        <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

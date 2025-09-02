@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
-    public class CommintyController : Controller
+    public class CommunityController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public CommintyController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        public CommunityController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -26,7 +26,6 @@ namespace SmartUniversity.Areas.Customer.Controllers
         public async Task<IActionResult> Index(int courseId, string color)
         {
             var course = await _unitOfWork.UniversityCourses.GetCourseWithDetailsAsync(courseId);
-
             if (course == null)
                 return NotFound();
 
@@ -43,12 +42,15 @@ namespace SmartUniversity.Areas.Customer.Controllers
                     .ToList()
             };
 
+            ViewData["CourseId"] = courseId;
+            ViewData["Color"] = color;
+
             return View(vm);
         }
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreatePost(CreatePostVM vm)
+        public async Task<IActionResult> CreatePost(CreatePostVM vm, string color)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound();
@@ -66,11 +68,8 @@ namespace SmartUniversity.Areas.Customer.Controllers
 
             var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
             if (!Directory.Exists(uploadDir))
-            {
                 Directory.CreateDirectory(uploadDir);
-            }
 
-            
             if (vm.Files != null && vm.Files.Any())
             {
                 foreach (var file in vm.Files)
@@ -97,7 +96,6 @@ namespace SmartUniversity.Areas.Customer.Controllers
                 await _unitOfWork.PostFiles.CommitAsync();
             }
 
-            // 🔹 إضافة الرابط إذا موجود
             if (!string.IsNullOrEmpty(vm.Link))
             {
                 var postLink = new PostLink
@@ -110,11 +108,12 @@ namespace SmartUniversity.Areas.Customer.Controllers
             }
 
             TempData["success-notification"] = "Post created successfully!";
-            return RedirectToAction("Index", new { courseId = vm.CourseId });
+            return RedirectToAction("Index", new { courseId = vm.CourseId, color });
         }
+
         [HttpPost]
-      [Authorize]
-        public async Task<IActionResult> AddComment(int postId, string content)
+        [Authorize]
+        public async Task<IActionResult> AddComment(int postId, string content, string color)
         {
             if (string.IsNullOrWhiteSpace(content))
             {
@@ -137,17 +136,17 @@ namespace SmartUniversity.Areas.Customer.Controllers
             await _unitOfWork.Comments.CreateAsync(comment);
             await _unitOfWork.Comments.CommitAsync();
 
-            // عشان نرجع لنفس الكورس اللي فيه البوست
-            var post = await _unitOfWork.CommunityPosts.GetOneAsync(e=>e.Id==postId);
-                    if (post == null)
-                        return NotFound();
+            var post = await _unitOfWork.CommunityPosts.GetOneAsync(e => e.Id == postId);
+            if (post == null)
+                return NotFound();
 
             TempData["success-notification"] = "Comment added successfully!";
-            return RedirectToAction("Index", new { courseId = post.CourseID});
+            return RedirectToAction("Index", new { courseId = post.CourseID, color });
         }
+
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> DeletePost(int postId)
+        public async Task<IActionResult> DeletePost(int postId, string color)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
@@ -175,47 +174,40 @@ namespace SmartUniversity.Areas.Customer.Controllers
                 await _unitOfWork.PostLinks.DeleteAsync(link);
             }
 
-            // مسح الكومنتات المرتبطة
             var comments = await _unitOfWork.Comments.GetAsync(c => c.PostID == postId);
             foreach (var comment in comments)
             {
                 await _unitOfWork.Comments.DeleteAsync(comment);
             }
 
-            // في الآخر نمسح البوست نفسه
             await _unitOfWork.CommunityPosts.DeleteAsync(post);
             await _unitOfWork.CommunityPosts.CommitAsync();
 
             TempData["success-notification"] = "Post deleted successfully!";
-            return RedirectToAction("Index", new { courseId = post.CourseID });
-
+            return RedirectToAction("Index", new { courseId = post.CourseID, color });
         }
-            [HttpPost]
-            [Authorize]
-            public async Task<IActionResult> DeleteComment(int commentId)
-            {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null) return Unauthorized();
 
-                var comment = await _unitOfWork.Comments.GetOneAsync(c => c.Id == commentId);
-                if (comment == null) return NotFound();
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> DeleteComment(int commentId, string color)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
 
-                if (comment.AuthorId != user.Id)
-                    return Forbid();
+            var comment = await _unitOfWork.Comments.GetOneAsync(c => c.Id == commentId);
+            if (comment == null) return NotFound();
 
-                // 🔹 هات البوست عشان تجيب CourseID
-                var post = await _unitOfWork.CommunityPosts.GetOneAsync(p => p.Id == comment.PostID);
-                if (post == null) return NotFound();
+            if (comment.AuthorId != user.Id)
+                return Forbid();
 
-                await _unitOfWork.Comments.DeleteAsync(comment);
-                await _unitOfWork.Comments.CommitAsync();
+            var post = await _unitOfWork.CommunityPosts.GetOneAsync(p => p.Id == comment.PostID);
+            if (post == null) return NotFound();
 
-                TempData["success-notification"] = "Comment deleted successfully!";
-                return RedirectToAction("Index", new { courseId = post.CourseID });
-            }
+            await _unitOfWork.Comments.DeleteAsync(comment);
+            await _unitOfWork.Comments.CommitAsync();
 
-
-
-
+            TempData["success-notification"] = "Comment deleted successfully!";
+            return RedirectToAction("Index", new { courseId = post.CourseID, color });
         }
     }
+}
