@@ -22,12 +22,19 @@ namespace SmartUniversity.Areas.Identity.Controllers
             {
                 return RedirectToAction("index", "DoctorAndAssistant", new { area = "Customer" });
 
-                return RedirectToAction("index", "UniversityStudent");
             }
-            else if (User.IsInRole($"{SD.Doctor}"))
+            else if (User.IsInRole($"{SD.Assistant}"))
             {
-                return RedirectToAction("index", "DoctorAndAssistant");
-          }
+                return RedirectToAction("index", "DoctorAndAssistant", new { area = "Customer" });
+
+            }
+            else if (User.IsInRole($"{SD.ExternalStudent}"))
+            {
+                return RedirectToAction("index", "ExternalStudent", new { area = "Customer" });
+
+            }
+            
+
 
             // لو مفيش Role مناسب
             return View();

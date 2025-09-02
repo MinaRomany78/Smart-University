@@ -10,5 +10,11 @@ namespace DataAccess.Repositories.IRepositories
         {
             _context = context;
         }
+        public async Task RemoveRangeAsync(IEnumerable<Cart> carts)
+        {
+            _context.Carts.RemoveRange(carts);
+            await Task.CompletedTask;
+        }
+
     }
 }
