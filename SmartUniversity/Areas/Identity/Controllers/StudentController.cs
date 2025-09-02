@@ -73,7 +73,7 @@ namespace SmartUniversity.Areas.Identity.Controllers
             await _emailSender.SendEmailAsync(applicationData.Email, "Your Student Profile", emailBody);
 
             TempData["success-notification"] = "Email sent successfully!";
-            return RedirectToAction("Index", "Home", new { area = "Customer" });
+            return RedirectToAction("Login", "Account", new { area = "Identity" });
         }
 
 

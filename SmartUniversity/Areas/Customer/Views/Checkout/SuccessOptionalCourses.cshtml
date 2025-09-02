@@ -1,0 +1,38 @@
+﻿@using Entities.Models
+@model IEnumerable<UserOptionalCourse>
+
+@{
+    ViewData["Title"] = "Payment Successful - Optional Courses";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h2 class="text-success mb-3">✅ Payment Successful!</h2>
+        <p class="lead">Your optional courses are now available in your account.</p>
+
+        @if (Model != null && Model.Any())
+        {
+            <h4 class="mt-4">🎓 Courses you’ve unlocked:</h4>
+            <ul class="list-group mt-3">
+                @foreach (var course in Model)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@course.OptionalCourse?.Name</span>
+                        <span class="badge bg-success rounded-pill">Purchased on @course.PurchaseDate.ToLocalTime().ToShortDateString()</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="alert alert-info mt-3">
+                No courses found. Please check your profile or courses page.
+            </div>
+        }
+
+        <div class="mt-4">
+            <a asp-area="Customer" asp-controller="ExternalStudent" asp-action="" class="btn btn-primary rounded-3">Go to My Courses</a>
+        </div>
+    </div>
+</div>
