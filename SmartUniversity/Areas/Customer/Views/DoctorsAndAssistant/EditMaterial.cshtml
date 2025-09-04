@@ -1,0 +1,29 @@
+﻿@model Entities.ViewModel.MaterialVM
+
+@{
+    ViewData["Title"] = "Edit Material";
+    Layout = "~/Views/Shared/_CourseLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">✏️ Edit Material</h3>
+
+    <form asp-action="EditMaterial" method="post">
+        @* Hidden fields *@
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="UniversityCourseID" />
+
+        <div class="mb-3">
+            <label asp-for="MaterialLink" class="form-label">Material Link</label>
+            <input asp-for="MaterialLink" class="form-control" placeholder="Enter material link..." />
+            <span asp-validation-for="MaterialLink" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">💾 Update</button>
+        <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

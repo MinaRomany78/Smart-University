@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Entities.ViewModel.EnrollmentVM>
+﻿@model IEnumerable<UniversityCourse>
 @{
     ViewData["Title"] = "My Enrollments";
     var colors = new string[] { "#1a73e8", "#0f9d58", "#ea4335", "#9c27b0", "#009688", "#ff9800", "#5f6368" };
@@ -10,7 +10,7 @@
 <div class="container-fluid enrollment-body">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-lg-2 col-md-3 sidebar p-0">
+         <div class="col-lg-2 col-md-3 sidebar p-0">
             <div class="sidebar-inner p-3">
                 <h5 class="sidebar-title">Menu</h5>
                 <ul class="nav flex-column">
@@ -33,7 +33,7 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link small" href="#">
-                                        <i class="bi bi-dot"></i> @course.CourseName
+                                        <i class="bi bi-dot"></i> @course.Name
                                     </a>
                                 </li>
                             }
@@ -50,18 +50,18 @@
 
         <!-- Main Content -->
         <div class="col-lg-10 col-md-9 p-4">
-            <h3 class="page-title">My Enrollments</h3>
+            <h3 class="page-title">My Courses</h3>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 @foreach (var course in Model)
                 {
                     var color = colors[i % colors.Length];
-                    var teacherName = "Dr " + course.DoctorName;
+                    var teacherName = "Dr " + course.Doctor.ApplicationUser.FullName;
                     var teacherInitial = teacherName.Split(' ')[1].Substring(0, 1);
 
                     <div class="col">
                         <div class="classroom-card">
                             <div class="classroom-card-header" style="background:@color;">
-                                <h5 class="course-name">@course.CourseName</h5>
+                                <h5 class="course-name">@course.Name</h5>
                             </div>
                             <div class="classroom-card-body p-3">
                                 <!-- Doctor -->
@@ -75,11 +75,11 @@
 
                                 <!-- Assistants -->
                                 <div class="assistant-badges">
-                                    <div class="teacher-label">Assistants</div>
-                                    @foreach (var item in course.Assistants)
-                                    {
-                                        <span class="badge">@item</span>
-                                    }
+                                    <div class="teacher-label">Department</div>
+                                   
+                                        <span class="badge">@course.Department.Name</span>
+                                    <span class="badge">@course.Term.Name</span>
+                                    
                                 </div>
                             </div>
                             <div class="card-actions">
@@ -87,10 +87,11 @@
                                    asp-action="Index"
                                    asp-controller="Community"
                                    asp-area="Customer"
-                                   asp-route-courseId="@course.CourseId"
+                                   asp-route-courseId="@course.Id"
                                    asp-route-color="@color">
                                     <i class="bi bi-box-arrow-in-right"></i> Enter
                                 </a>
+
 
                             </div>
                         </div>

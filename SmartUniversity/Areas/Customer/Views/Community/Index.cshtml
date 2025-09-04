@@ -4,7 +4,8 @@
 @model Entities.ViewModel.CommunityVM
 @{
     ViewData["Title"] = "Community";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_CourseLayout.cshtml";
+    ViewData["ActiveTab"] = "Menu";
 }
 
 <div class="container max-w-4xl mx-auto mt-6" style="max-width: 900px; margin: 2rem auto;">
@@ -42,6 +43,8 @@
         <div class="card-body p-4">
             <form id="postForm" asp-action="CreatePost" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="CourseId" value="@Model.Course.Id" />
+                <input type="hidden" name="color" value="@Model.Color" />   <!-- 🔹 مهم -->
+
                 <div class="d-flex align-items-start gap-3">
                     <div class="avatar-placeholder">
                         <i class="bi bi-person-fill text-primary fs-5"></i>
@@ -87,7 +90,7 @@
                             <small class="text-muted time-stamp">@post.PostDate.ToString("MMM dd, yyyy HH:mm")</small>
                         </div>
 
-                        @if (post.AuthorId == UserManager.GetUserId(User))   // ✅ Dropdown بدل الزرار
+                        @if (post.AuthorId == UserManager.GetUserId(User))
                         {
                             <div class="ms-auto dropdown">
                                 <button class="btn btn-sm btn-link text-muted dropdown-toggle-no-caret" type="button" data-bs-toggle="dropdown">
@@ -97,6 +100,7 @@
                                     <li>
                                         <form asp-action="DeletePost" method="post">
                                             <input type="hidden" name="postId" value="@post.Id" />
+                                            <input type="hidden" name="color" value="@Model.Color" /> <!-- 🔹 مهم -->
                                             <button type="submit" class="dropdown-item text-danger">
                                                 <i class="bi bi-trash me-2"></i> Delete Post
                                             </button>
@@ -109,14 +113,13 @@
 
                     <p class="mt-2 mb-3">@post.Content</p>
 
-                    @* ملفات البوست *@
+                    @* ملفات *@
                     @if (post.Files != null && post.Files.Any())
                     {
                         <div class="mb-2 d-flex flex-wrap gap-2">
                             @foreach (var file in post.Files)
                             {
                                 var extension = System.IO.Path.GetExtension(file.FilePath).ToLower();
-
                                 if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif")
                                 {
                                     <img src="@file.FilePath" alt="@System.IO.Path.GetFileName(file.FilePath)"
@@ -130,7 +133,7 @@
                                         <i class="bi bi-file-earmark-pdf fs-2 text-danger"></i>
                                     </div>
                                 }
-                                else if (extension == ".mp4" || extension == ".webm" || extension == ".ogg")
+                                else if (extension == ".mp4" || extension == ".webm")
                                 {
                                     <div style="width:150px; height:100px; border:1px solid #ddd; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer;"
                                          data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-type="video" data-file="@file.FilePath">
@@ -139,19 +142,8 @@
                                 }
                                 else
                                 {
-                                    <a href="@file.FilePath" target="_blank" class="d-block">@System.IO.Path.GetFileName(file.FilePath)</a>
+                                    <a href="@file.FilePath" target="_blank">@System.IO.Path.GetFileName(file.FilePath)</a>
                                 }
-                            }
-                        </div>
-                    }
-
-                    @* روابط *@
-                    @if (post.Links != null && post.Links.Any())
-                    {
-                        <div class="mb-2">
-                            @foreach (var link in post.Links)
-                            {
-                                <a href="@link.Url" target="_blank">@link.Url</a>
                             }
                         </div>
                     }
@@ -159,7 +151,7 @@
                     <hr />
                     <h6 class="fw-semibold text-muted mb-3">
                         Comments
-                        <span class="badge bg-light text-muted ms-1">@post.Comments?.Count() </span>
+                        <span class="badge bg-light text-muted ms-1">@post.Comments?.Count()</span>
                     </h6>
 
                     @if (post.Comments != null && post.Comments.Any())
@@ -175,7 +167,7 @@
                                     <p class="mb-1">@comment.Content</p>
                                     <small class="text-muted time-stamp">@comment.DatePosted.ToString("MMM dd, yyyy HH:mm")</small>
 
-                                    @if (comment.AuthorId == UserManager.GetUserId(User))   
+                                    @if (comment.AuthorId == UserManager.GetUserId(User))
                                     {
                                         <div class="dropdown d-inline ms-2">
                                             <button class="btn btn-sm btn-link text-muted dropdown-toggle-no-caret" type="button" data-bs-toggle="dropdown">
@@ -185,6 +177,7 @@
                                                 <li>
                                                     <form asp-action="DeleteComment" method="post">
                                                         <input type="hidden" name="commentId" value="@comment.Id" />
+                                                        <input type="hidden" name="color" value="@Model.Color" /> <!-- 🔹 مهم -->
                                                         <button type="submit" class="dropdown-item text-danger">
                                                             <i class="bi bi-trash me-2"></i> Delete Comment
                                                         </button>
@@ -197,13 +190,10 @@
                             </div>
                         }
                     }
-                    else
-                    {
-                        <p class="text-muted ms-4">No comments yet.</p>
-                    }
 
                     <form asp-action="AddComment" method="post" class="d-flex align-items-center ms-4 mt-2 gap-2">
                         <input type="hidden" name="PostId" value="@post.Id" />
+                        <input type="hidden" name="color" value="@Model.Color" /> <!-- 🔹 مهم -->
                         <div class="comment-avatar">
                             <i class="bi bi-person-fill text-primary fs-6"></i>
                         </div>
@@ -224,6 +214,7 @@
         </div>
     }
 </div>
+
 
 <!-- File Preview Modal -->
 <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
