@@ -38,6 +38,9 @@ namespace DataAccess.Repositories
         public ICartRepository Carts { get; }
         public IOrderRepository Orders { get; }
 
+        public ISessionTaskRepository SessionTasks { get; }
+        public ICourseSessionRepository CourseSessions { get; }
+
 
         public UnitOfWork(
             ApplicationDbContext context,
@@ -70,8 +73,9 @@ namespace DataAccess.Repositories
 
             ICourseReviewRepository courseReviews,
             ICartRepository carts,
-            IOrderRepository orders
-
+            IOrderRepository orders,
+            ISessionTaskRepository sessionTasks,
+            ICourseSessionRepository courseSessions
             )
         {
             _context = context;
@@ -106,7 +110,8 @@ namespace DataAccess.Repositories
             UserOptionalCourses = userOptionalCourses;
             Carts = carts;
             Orders = orders;
-
+            SessionTasks = sessionTasks;
+            CourseSessions = courseSessions;
         }
 
         public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();

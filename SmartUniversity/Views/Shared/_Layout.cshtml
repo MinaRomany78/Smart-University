@@ -94,31 +94,34 @@
                     <!-- Links for External Student -->
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Courses" asp-action="Index">Courses</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="ExternalOCourses" asp-action="Index">My Courses</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Mentor" asp-action="Index">Mentor</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Contact" asp-action="Index">Contact Us</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Docs" asp-action="Index">Docs</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Cart" asp-action="Index">Cart</a></li>
                     </ul>
                 }
-                else
+                else if (User.IsInRole($"{SD.Instructor}"))
+                {
+                    <!-- Links for Instructor -->
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="InstructorCourse" asp-action="Index">My Courses</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Contact" asp-action="Index">Contact Us</a></li>
+                    </ul>
+                }
+                else if (User.IsInRole($"{SD.UniversityStudent}"))
                 {
                     <!-- Links for Internal Student -->
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="UniversityStudent" asp-action="RegisterCourses">Registration Course</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="UniversityStudent" asp-action="MyEnrollments">My Courses</a></li>
-
-                        @* <li class="nav-item">
-                            <a class="nav-link" asp-area="Customer" asp-controller="UniversityStudent" asp-action="RegisterCourses">Registration Course</a>
-                        </li> *@
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Mentor" asp-action="Index">Doctors</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Assistant" asp-action="Index">Assistant</a></li>
-                        @* <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Cart" asp-action="Index">Cart</a></li> *@
-
                     </ul>
                 }
+
 
                 <!-- Profile Dropdown -->
                 <ul class="navbar-nav ms-3">

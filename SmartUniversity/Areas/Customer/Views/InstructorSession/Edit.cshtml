@@ -1,0 +1,104 @@
+﻿@using Entities.ViewModel
+@model CourseSessionVM
+
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        padding: 2.5rem 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(37, 117, 252, 0.15);
+    }
+
+    h2 {
+        color: #2575fc;
+        font-weight: 700;
+        margin-bottom: 1.8rem;
+        text-align: center;
+    }
+
+    label.form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    input.form-control, input.form-check-input {
+        border-radius: 0.5rem;
+        border: 1.8px solid #ced4da;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        input.form-control:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 8px rgba(37, 117, 252, 0.3);
+            outline: none;
+        }
+
+    .form-check-label {
+        font-weight: 600;
+        color: #555;
+        user-select: none;
+    }
+
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        border: none;
+        color: white;
+        font-weight: 700;
+        padding: 0.65rem 2rem;
+        border-radius: 50px;
+        width: 100%;
+        font-size: 1.1rem;
+        box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #4b0db8 0%, #1a4ed8 100%);
+            transform: scale(1.05);
+        }
+</style>
+
+<div class="container py-5">
+    <div class="form-container">
+        <h2>Edit Session</h2>
+        <form asp-action="Edit" method="post" novalidate>
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="OptionalCourseId" />
+
+            <div class="mb-4">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" placeholder="Enter session title" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="ReleaseDate" class="form-label"></label>
+                <input asp-for="ReleaseDate" type="date" class="form-control" />
+                <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="MaterialLink" class="form-label"></label>
+                <input asp-for="MaterialLink" class="form-control" placeholder="https://example.com/material" />
+                <span asp-validation-for="MaterialLink" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Order" class="form-label"></label>
+                <input asp-for="Order" type="number" class="form-control" min="1" />
+                <span asp-validation-for="Order" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-gradient">Save Session</button>
+        </form>
+    </div>
+</div>
+

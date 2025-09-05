@@ -44,6 +44,8 @@ namespace DataAccess.Data
         public DbSet<Term> Terms { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<CourseSession> courseSessions { get; set; }
+        public DbSet<SessionTask> SessionTask { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -137,6 +139,13 @@ namespace DataAccess.Data
                 .WithMany()
                 .HasForeignKey(p => p.AuthorId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<SessionTask>()
+                .HasOne(t => t.CourseSession)
+                .WithMany(s => s.Tasks)
+                .HasForeignKey(t => t.CourseSessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
 
 
 

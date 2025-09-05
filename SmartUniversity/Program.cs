@@ -65,6 +65,8 @@ builder.Services.AddScoped<IPostLinkRepository, PostLinkRepository>();
 builder.Services.AddScoped<IPostFileRepository, PostFileRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<ICourseSessionRepository, CourseSessionRepository>();
+builder.Services.AddScoped<ISessionTaskRepository, SessionTaskRepository>();
 
 
 // UnitOfWork

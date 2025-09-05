@@ -1,0 +1,100 @@
+﻿@using Entities.ViewModel
+@model NewCourseApplicationVM
+
+<style>
+    .apply-card {
+        max-width: 600px;
+        margin: 2rem auto;
+        background: #fff;
+        padding: 2.5rem 2rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(37, 117, 252, 0.15);
+        border: none;
+    }
+
+        .apply-card h3 {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .apply-card label.form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .apply-card input.form-control,
+        .apply-card textarea.form-control {
+            border-radius: 0.75rem;
+            border: 1.8px solid #ced4da;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+        }
+
+            .apply-card input.form-control:focus,
+            .apply-card textarea.form-control:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 10px rgba(37, 117, 252, 0.3);
+                outline: none;
+            }
+
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .btn-submit {
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        border: none;
+        color: white;
+        font-weight: 700;
+        padding: 0.75rem 2.5rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        user-select: none;
+    }
+
+        .btn-submit:hover,
+        .btn-submit:focus {
+            background: linear-gradient(90deg, #1a4ed8, #4b0db8);
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(37, 117, 252, 0.6);
+            outline: none;
+        }
+
+        .btn-submit i {
+            font-size: 1.3rem;
+        }
+</style>
+
+<div class="card apply-card shadow-lg">
+    <h3>Apply for a New Course</h3>
+
+    <form asp-action="ApplyNewCourse" method="post" novalidate>
+        <div class="mb-4">
+            <label asp-for="CourseName" class="form-label"></label>
+            <input asp-for="CourseName" class="form-control" placeholder="Enter course name" />
+            <span asp-validation-for="CourseName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Experience" class="form-label"></label>
+            <textarea asp-for="Experience" class="form-control" rows="5" placeholder="Describe your experience with this course"></textarea>
+            <span asp-validation-for="Experience" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="bi bi-send-fill"></i> Submit Application
+        </button>
+    </form>
+</div>

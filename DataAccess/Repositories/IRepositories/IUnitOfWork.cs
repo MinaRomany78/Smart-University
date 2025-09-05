@@ -34,6 +34,8 @@ namespace DataAccess.Repositories.IRepositories
         ICourseReviewRepository CourseReviews { get; }
         ICartRepository Carts { get; }
         IOrderRepository Orders { get; }
+        ISessionTaskRepository SessionTasks { get; }
+        ICourseSessionRepository CourseSessions { get; }
 
 
         Task<int> CompleteAsync();
