@@ -1,0 +1,38 @@
+﻿@model IEnumerable<SessionTask>
+
+<div class="container py-4">
+    <h2>Student Submissions</h2>
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Student</th>
+                <th>Task</th>
+                <th>Submission</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>@task.ApplicationUser.UserName</td>
+                    <td>@task.Title</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(task.SubmissionLink))
+                        {
+                            <a href="@task.SubmissionLink" target="_blank">📂 Open</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No submission</span>
+                        }
+                    </td>
+                    <td>@task.SubmittedAt?.ToShortDateString()</td>
+                    <td>@(task.IsCompleted ? "✅ Completed" : "❌ Pending")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

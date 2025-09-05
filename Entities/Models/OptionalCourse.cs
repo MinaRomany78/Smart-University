@@ -25,5 +25,6 @@ namespace Entities.Models
         public int InstructorId { get; set; }
         public Instructor Instructor { get; set; } = null!;
         public ICollection<CourseReview> Reviews { get; set; } = new List<CourseReview>();
+        public ICollection<CourseSession> Sessions { get; set; } = new List<CourseSession>();
     }
 }

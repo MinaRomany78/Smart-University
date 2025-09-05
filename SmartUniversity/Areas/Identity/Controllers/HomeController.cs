@@ -33,7 +33,11 @@ namespace SmartUniversity.Areas.Identity.Controllers
                 return RedirectToAction("index", "ExternalStudent", new { area = "Customer" });
 
             }
-            
+            else if (User.IsInRole($"{SD.Instructor}"))
+            {
+                return RedirectToAction("index", "ExternalStudent", new { area = "Customer" });
+            }
+
 
 
             // لو مفيش Role مناسب

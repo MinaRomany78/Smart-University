@@ -74,14 +74,25 @@ namespace SmartUniversity.Areas.Customer.Controllers
 
             var avg = reviews.Any() ? reviews.Average(e => e.Rating) : 0;
 
+            var user = await _userManager.GetUserAsync(User);
 
+            bool hasPurchased = false;
+
+            if (user is not null)
+            {
+                var order = await _unitOfWork.Orders.GetOneAsync(e => e.ApplicationUserId == user.Id
+                && e.OptionalCourseId == id);
+
+                hasPurchased = order is not null;
+            }
 
             return View(new OcoursesWithTopANDReviewsVM()
             {
                 OptionalCourse = oCourse,
                 TopCourses = topCourses,
                 Reviews = reviews,
-                AverageRating = avg
+                AverageRating = avg,
+                HasPurchased = hasPurchased
             });
         }
 

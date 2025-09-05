@@ -153,60 +153,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
             }
             return NotFound();
         }
-        //public async Task<IActionResult> PayNow()
-        //{
-        //    var user = await _userManager.GetUserAsync(User);
-        //    if (user == null) return NotFound();
 
-        //    var cartItems = await _unitOfWork.Carts.GetAsync(
-        //        c => c.ApplicationUserId == user.Id,
-        //        include: new Expression<Func<Cart, object>>[]
-        //        {
-        //         e => e.OptionalCourse
-        //        }
-        //    );
-
-        //    if (cartItems == null || !cartItems.Any())
-        //    {
-        //        TempData["error-notification"] = "You do not have any courses to pay for.";
-        //        return RedirectToAction(nameof(Index));
-        //    }
-
-        //    var options = new SessionCreateOptions
-        //    {
-        //        PaymentMethodTypes = new List<string> { "card" },
-        //        LineItems = new List<SessionLineItemOptions>(),
-        //        Mode = "payment",
-        //        SuccessUrl = $"{Request.Scheme}://{Request.Host}/Customer/Checkout/SuccessOptionalCoures",
-        //        CancelUrl = $"{Request.Scheme}://{Request.Host}/Customer/Checkout/CancelOptionalCoures",
-        //    };
-
-        //    foreach (var item in cartItems)
-        //    {
-        //        var originalPrice = item.OptionalCourse.Price;
-        //        var discount = item.DiscountPercentage ?? 0m;
-        //        var finalPrice = originalPrice - (originalPrice * discount);
-
-        //        options.LineItems.Add(new SessionLineItemOptions
-        //        {
-        //            PriceData = new SessionLineItemPriceDataOptions
-        //            {
-        //                Currency = "egp", //
-        //                UnitAmount = (long)(finalPrice * 100), 
-        //                ProductData = new SessionLineItemPriceDataProductDataOptions
-        //                {
-        //                    Name = item.OptionalCourse.Name
-        //                }
-        //            },
-        //            Quantity = 1
-        //        });
-        //    }
-
-        //    var service = new SessionService();
-        //    var session = service.Create(options);
-
-        //    return Redirect(session.Url);
-        //}
         public async Task<IActionResult> PayNow(int? courseId = null)
         {
             var user = await _userManager.GetUserAsync(User);
