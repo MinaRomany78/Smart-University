@@ -27,7 +27,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
             if (lectures == null) { return NotFound(); }
             ViewData["CourseId"] = CourseId;
             ViewData["ActiveTab"] = "Lectures";
-            ViewData["Color"] = color;
+            ViewData["Color"] = color.StartsWith("#") ? color : "#" + color; // يضمن إنها تبدأ بـ #
             return View(lectures);
         }
         public async Task<IActionResult> Lab(int CourseId, string color)
@@ -37,7 +37,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
             if (Labs == null) { return NotFound(); }
             ViewData["CourseId"] = CourseId;
             ViewData["ActiveTab"] = "Labs";
-            ViewData["Color"] = color;
+           ViewData["Color"] = color.StartsWith("#") ? color : "#" + color; // يضمن إنها تبدأ بـ #
             return View(Labs);
         }
     }

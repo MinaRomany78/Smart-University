@@ -43,7 +43,9 @@ namespace SmartUniversity.Areas.Customer.Controllers
             };
 
             ViewData["CourseId"] = courseId;
-            ViewData["Color"] = color;
+            ViewData["ActiveTab"] = "Menu";
+
+            ViewData["Color"] = color.StartsWith("#") ? color : "#" + color; // يضمن إنها تبدأ بـ #
 
             return View(vm);
         }

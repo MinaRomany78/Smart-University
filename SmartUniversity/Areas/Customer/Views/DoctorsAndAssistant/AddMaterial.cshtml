@@ -1,16 +1,17 @@
-﻿@model Entities.ViewModel.MaterialVM
-
+﻿@using Utility.DBInitializer
+@model Entities.ViewModel.MaterialVM
 @{
     ViewData["Title"] = "Add Material";
     Layout = "~/Views/Shared/_CourseLayout.cshtml";
+    var color = ViewData["Color"]?.ToString() ?? "#0d6efd";
 }
 
-<div class="container mt-4">
-    <h3 class="mb-4">➕ Add Material</h3>
+<div class="container mt-4" style="max-width: 700px;">
+    <h3 class="mb-4" style="color:@color;">➕ Add Material</h3>
 
     <form asp-action="AddMaterial" method="post">
-        @* Hidden to keep Course ID *@
         <input type="hidden" asp-for="UniversityCourseID" />
+        <input type="hidden" name="color" value="@color" />
 
         <div class="mb-3">
             <label asp-for="MaterialLink" class="form-label">Material Link</label>
@@ -20,11 +21,17 @@
 
         <div class="alert alert-info">
             ⚡ Note:
-            - If you are logged in as <strong>Doctor</strong>, this will be saved as a <span class="text-primary">Lecture</span>.
-            - If you are logged in as <strong>Assistant</strong>, this will be saved as a <span class="text-success">Lab</span>.
+            @if (User.IsInRole(SD.Doctor))
+            {
+                <span>This will be saved as a <strong class="text-primary">Lecture</strong>.</span>
+            }
+            else if (User.IsInRole(SD.Assistant))
+            {
+                <span>This will be saved as a <strong class="text-success">Lab</strong>.</span>
+            }
         </div>
 
-        <button type="submit" class="btn btn-success">✅ Save</button>
+        <button type="submit" class="btn" style="background-color:@color; color:#fff;">✅ Save</button>
         <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
     </form>
 </div>

@@ -3,5 +3,9 @@
 
 namespace DataAccess.Repositories.IRepositories
 {
-    public interface ISubjectTaskRepository : IRepository<SubjectTask> { }
+    public interface ISubjectTaskRepository : IRepository<SubjectTask>
+    {
+        Task<SubjectTask?> GetTaskWithSubmissionsAsync(int taskId);
+    }
+
 }

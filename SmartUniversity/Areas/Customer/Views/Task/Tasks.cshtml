@@ -1,0 +1,272 @@
+﻿@using Utility.DBInitializer
+@model IEnumerable<Entities.Models.SubjectTask>
+@{
+    ViewData["Title"] = "Tasks";
+    Layout = "~/Views/Shared/_CourseLayout.cshtml";
+    var courseId = ViewData["CourseId"];
+    var color = ViewData["Color"]?.ToString() ?? "#0d6efd";
+}
+
+<div class="container mt-4" style="max-width: 950px;">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold d-flex align-items-center" style="color:@color;">
+            <i class="bi bi-list-check me-2"></i> Tasks
+        </h3>
+
+        @if (User.IsInRole(SD.Doctor) || User.IsInRole(SD.Assistant))
+        {
+            <a asp-action="CreateTask"
+               asp-route-courseId="@courseId"
+               asp-route-color="@color"
+               class="btn btn-gradient px-3 rounded-pill shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Create Task
+            </a>
+        }
+    </div>
+
+    <!-- Tasks List -->
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var task in Model)
+        {
+            var mySubmission = task.TaskSubmissions
+            .FirstOrDefault(s => s.StudentID == (int?)ViewBag.StudentId && s.TaskID == task.Id);
+
+            <div class="card shadow-lg border-0 rounded-4 mb-3 task-card">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between flex-wrap align-items-start gap-3">
+
+                        <div>
+                            <h5 class="fw-semibold mb-1">@task.Title</h5>
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-calendar-event me-1"></i>
+                                @task.Deadline.ToString("MMM dd, yyyy - HH:mm")
+                            </span>
+                        </div>
+
+                        @if (User.IsInRole(SD.UniversityStudent) && mySubmission != null)
+                        {
+                            <div class="text-end">
+                                <span class="badge @(mySubmission.Status == SubmissionStatus.OnTime ? "bg-success" : "bg-danger") mb-1">
+                                    <i class="bi @(mySubmission.Status == SubmissionStatus.OnTime ? "bi-clock-history" : "bi-exclamation-triangle") me-1"></i>
+                                    @(mySubmission.Status == SubmissionStatus.OnTime ? "On Time" : "Late")
+                                </span>
+
+                                @if (mySubmission.Grade.HasValue)
+                                {
+                                    <div class="mt-1 fw-semibold text-primary small">
+                                        <i class="bi bi-award-fill me-1"></i>
+                                        Grade: @mySubmission.Grade
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- Dropdown (Doctor/Assistant only) -->
+                        @if (User.IsInRole(SD.Doctor) || User.IsInRole(SD.Assistant))
+                        {
+                            <div class="dropdown">
+                                <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded-3">
+                                    <li>
+                                        <a asp-action="EditTask"
+                                           asp-route-id="@task.Id"
+                                           asp-route-courseId="@courseId"
+                                           asp-route-color="@color"
+                                           class="dropdown-item">
+                                            <i class="bi bi-pencil-square me-1"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <button type="button"
+                                                class="dropdown-item text-danger btn-delete"
+                                                data-delete-url='@Url.Action("DeleteTask", "Task", new { area = "Customer", id = task.Id, courseId = courseId, color = color })'>
+                                            <i class="bi bi-trash me-1"></i> Delete
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-muted mt-3">@task.Description</p>
+
+                    <!-- Actions -->
+                    <div class="d-flex gap-2 mt-2 flex-wrap">
+                        @if (User.IsInRole(SD.Doctor) || User.IsInRole(SD.Assistant))
+                        {
+                            <a asp-action="Submissions"
+                               asp-route-taskId="@task.Id"
+                               asp-route-color="@color"
+                               class="btn btn-sm btn-outline-dynamic rounded-pill">
+                                <i class="bi bi-people me-1"></i> Submissions
+                            </a>
+                        }
+
+                        @if (User.IsInRole(SD.UniversityStudent))
+                        {
+                            if (mySubmission != null)
+                            {
+                                <a href="@mySubmission.SubmissionLink" target="_blank"
+                                   class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Open Submission
+                                </a>
+
+                                <form asp-action="CancelSubmission" method="post" class="d-inline-block cancel-form">
+                                    <input type="hidden" name="submissionId" value="@mySubmission.Id" />
+                                    <input type="hidden" name="courseId" value="@courseId" />
+                                    <input type="hidden" name="color" value="@color" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                                        <i class="bi bi-x-circle me-1"></i> Cancel
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-action="SubmitTask"
+                                   asp-route-taskId="@task.Id"
+                                   asp-route-courseId="@courseId"
+                                   asp-route-color="@color"
+                                   class="btn btn-sm btn-subtle rounded-pill">
+                                    <i class="bi bi-upload me-1"></i> Submit
+                                </a>
+                            }
+                        }
+                    </div>
+
+                    <!-- Feedbacks (for student only) -->
+                    @if (User.IsInRole(SD.UniversityStudent) && mySubmission != null)
+                    {
+                        if (task.Feedbacks != null && task.Feedbacks.Any())
+                        {
+                            <div class="mt-3">
+                                <h6 class="fw-bold">Feedback</h6>
+                                @foreach (var fb in task.Feedbacks)
+                                {
+                                    <div class="alert alert-light border rounded-3">
+                                        <span class="fw-semibold">Rating:</span> @fb.Rating / 5 <br />
+                                        <span class="fw-semibold">Comment:</span> @fb.Comment
+
+                                        @if (!string.IsNullOrEmpty(fb.ReplyFromStudent))
+                                        {
+                                            <div class="mt-2 ps-3 border-start">
+                                                <i class="bi bi-reply-fill text-success me-1"></i>
+                                                @fb.ReplyFromStudent
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="card text-center p-5 shadow-sm rounded-4 bg-light">
+            <i class="bi bi-inboxes fs-1 text-muted mb-3"></i>
+            <p class="fs-5 text-muted">No tasks available yet.</p>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .task-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+            .task-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+            }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, @color, #6610f2);
+            border: none;
+            color: #fff;
+        }
+
+            .btn-gradient:hover {
+                opacity: 0.9;
+            }
+
+        .btn-outline-dynamic {
+            border: 1.5px solid @color;
+            color: @color;
+        }
+
+            .btn-outline-dynamic:hover {
+                background-color: @color;
+                color: #fff;
+            }
+
+        .btn-subtle {
+            background-color: #f8f9fa;
+            border: 1px dashed #ccc;
+            color: #6c757d;
+        }
+
+            .btn-subtle:hover {
+                background-color: #e9ecef;
+                color: #000;
+            }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Confirm Delete Task
+        document.addEventListener("click", function (e) {
+            const target = e.target.closest(".btn-delete");
+            if (!target) return;
+
+            e.preventDefault();
+            const deleteUrl = target.getAttribute("data-delete-url");
+            if (!deleteUrl) return;
+
+            Swal.fire({
+                title: 'Delete Task?',
+                text: "This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = deleteUrl;
+                }
+            });
+        });
+
+        // Confirm Cancel Submission
+        document.addEventListener("submit", function (e) {
+            if (e.target.matches(".cancel-form")) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Cancel Submission?',
+                    text: "Your uploaded solution will be removed.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, cancel it',
+                    cancelButtonText: 'No, keep it',
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        e.target.submit();
+                    }
+                });
+            }
+        });
+    </script>
+}

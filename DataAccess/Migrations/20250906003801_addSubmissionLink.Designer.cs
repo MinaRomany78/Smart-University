@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250906003801_addSubmissionLink")]
+    partial class addSubmissionLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,7 +151,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "61ce6051-01f4-48dd-ab49-7eccc8073c90",
+                            ConcurrencyStamp = "29daab1b-ab39-4ccc-84da-61ef702095cd",
                             Email = "ahmed@test.com",
                             EmailConfirmed = true,
                             FirstName = "Ahmed",
@@ -159,7 +162,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "AHMED@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f8fef1f5-6c75-4b63-8591-55d294a3b8bc",
+                            SecurityStamp = "1375776f-b613-416e-85dc-9eeeaaa88667",
                             TwoFactorEnabled = false,
                             UserName = "ahmed@test.com"
                         },
@@ -167,7 +170,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-101",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "39f4638e-255c-4e93-93f5-df64fe8ad324",
+                            ConcurrencyStamp = "46a2cb69-9c76-4bfc-91c7-db4528770ecd",
                             Email = "mona@test.com",
                             EmailConfirmed = true,
                             FirstName = "Mona",
@@ -178,7 +181,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "MONA@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "19fefa9e-9d77-43ea-b73a-d35eb8f77fa6",
+                            SecurityStamp = "55e4c4fc-6ca7-4be8-b21a-ebf4291d2784",
                             TwoFactorEnabled = false,
                             UserName = "mona@test.com"
                         },
@@ -186,7 +189,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-102",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4681354a-e710-4e24-8951-4080a73ddb0d",
+                            ConcurrencyStamp = "a16c57c9-dd51-4049-9b51-329573277565",
                             Email = "hossam@test.com",
                             EmailConfirmed = true,
                             FirstName = "Hossam",
@@ -197,7 +200,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "HOSSAM@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "56ca53e8-c0ba-4567-bf0b-2bc8133c5bff",
+                            SecurityStamp = "02d0c6e7-18c1-4b73-b851-680da7ec8486",
                             TwoFactorEnabled = false,
                             UserName = "hossam@test.com"
                         },
@@ -205,7 +208,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-103",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "47967aaf-de73-4901-b362-55036f72164a",
+                            ConcurrencyStamp = "4dc2f01c-535b-45ff-a33c-fbc5ae8adfb4",
                             Email = "sara@test.com",
                             EmailConfirmed = true,
                             FirstName = "Sara",
@@ -216,7 +219,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "SARA@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e0b9bcb7-f961-404d-8c19-534cdd69cb57",
+                            SecurityStamp = "adbd0689-1211-49c8-8dd0-1d9c77d7ca49",
                             TwoFactorEnabled = false,
                             UserName = "sara@test.com"
                         },
@@ -224,7 +227,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-104",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0ce22a48-3dec-473b-aed3-3fbac405542e",
+                            ConcurrencyStamp = "1263a14f-65f8-4f6a-993e-69ab90502ede",
                             Email = "khaled@test.com",
                             EmailConfirmed = true,
                             FirstName = "Khaled",
@@ -235,7 +238,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "KHALED@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "34b09941-f129-44e1-b78a-9ca5e9953589",
+                            SecurityStamp = "815d224d-ff15-4f44-bd09-10b1fbef4d6c",
                             TwoFactorEnabled = false,
                             UserName = "khaled@test.com"
                         });
@@ -1646,9 +1649,6 @@ namespace DataAccess.Migrations
                     b.Property<int>("TaskID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TaskSubmissionId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AssistantID");
@@ -1656,8 +1656,6 @@ namespace DataAccess.Migrations
                     b.HasIndex("StudentID");
 
                     b.HasIndex("TaskID");
-
-                    b.HasIndex("TaskSubmissionId");
 
                     b.ToTable("Feedbacks");
                 });
@@ -3431,10 +3429,6 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entities.Models.TaskSubmission", null)
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("TaskSubmissionId");
-
                     b.Navigation("Assistant");
 
                     b.Navigation("Student");
@@ -3830,11 +3824,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("TaskSubmissions");
-                });
-
-            modelBuilder.Entity("Entities.Models.TaskSubmission", b =>
-                {
-                    b.Navigation("Feedbacks");
                 });
 
             modelBuilder.Entity("Entities.Models.Term", b =>
