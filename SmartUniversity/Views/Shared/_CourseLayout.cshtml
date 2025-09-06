@@ -1,8 +1,9 @@
 @{
     Layout = null;
     var courseId = ViewData["CourseId"];
-    var colorValue = ViewData["Color"]?.ToString() ?? "0d6efd"; 
-    var colorHex = "#" + colorValue; 
+    var colorValue = ViewData["Color"]?.ToString() ?? "0d6efd";
+    var colorHex = colorValue;
+
 }
 
 <!DOCTYPE html>
@@ -14,6 +15,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
     <style>
+        :root {
+            --dynamic-color: @colorHex;
+        }
+
         body {
             background-color: #f1f3f6;
         }
@@ -46,7 +51,7 @@
 
                 /* Active Tab (dynamic color) */
                 .sidebar-tabs .nav-link.active {
-                    background: linear-gradient(135deg, @colorHex, @colorHex );
+                    background: linear-gradient(135deg, var(--dynamic-color), var(--dynamic-color));
                     color: #fff !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
                 }
@@ -58,7 +63,7 @@
                 /* Hover */
                 .sidebar-tabs .nav-link:hover {
                     background-color: rgba(0,0,0,0.05);
-                    color: @colorHex;
+                    color: var(--dynamic-color);
                 }
 
         .main-content {
@@ -78,31 +83,25 @@
                 <div class="nav flex-column sidebar-tabs nav-pills">
                     <a asp-area="Customer" asp-controller="Community" asp-action="Index"
                        asp-route-courseId="@courseId" asp-route-color="@colorValue"
-                       class="nav-link @(ViewData["ActiveTab"] as string == "Menu" ? "active" : "")"
-                       style="@(ViewData["ActiveTab"] as string == "Menu" ? $"background:{colorHex};color:#fff;" : "")">
+                       class="nav-link @(ViewData["ActiveTab"] as string == "Menu" ? "active" : "")">
                         <i class="bi bi-house"></i> Community
                     </a>
-                   
 
                     <a asp-area="Customer" asp-controller="Material" asp-action="Lecture"
                        asp-route-courseId="@courseId" asp-route-color="@colorValue"
-                       class="nav-link @(ViewData["ActiveTab"] as string == "Lectures" ? "active" : "")"
-                       style="@(ViewData["ActiveTab"] as string == "Lectures" ? $"background:{colorHex};color:#fff;" : "")">
+                       class="nav-link @(ViewData["ActiveTab"] as string == "Lectures" ? "active" : "")">
                         <i class="bi bi-easel"></i> Lectures
                     </a>
 
                     <a asp-area="Customer" asp-controller="Material" asp-action="Lab"
                        asp-route-courseId="@courseId" asp-route-color="@colorValue"
-                       class="nav-link @(ViewData["ActiveTab"] as string == "Labs" ? "active" : "")"
-                       style="@(ViewData["ActiveTab"] as string == "Labs" ? $"background:{colorHex};color:#fff;" : "")">
+                       class="nav-link @(ViewData["ActiveTab"] as string == "Labs" ? "active" : "")">
                         <i class="bi bi-clipboard-data"></i> Labs
-
                     </a>
 
-                    <a asp-area="Customer" asp-controller="Tasks" asp-action="Index"
+                    <a asp-area="Customer" asp-controller="Task" asp-action="Tasks"
                        asp-route-courseId="@courseId" asp-route-color="@colorValue"
-                       class="nav-link @(ViewData["ActiveTab"] as string == "Tasks" ? "active" : "")"
-                       style="@(ViewData["ActiveTab"] as string == "Tasks" ? $"background:{colorHex};color:#fff;" : "")">
+                       class="nav-link @(ViewData["ActiveTab"] as string == "Tasks" ? "active" : "")">
                         <i class="bi bi-list-check"></i> Tasks
                     </a>
                 </div>

@@ -14,9 +14,14 @@ namespace Entities.Models
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime Deadline { get; set; }
-        public int AssignedBy { get; set; } 
-        public Doctor Doctor { get; set; } = null!;
+        public int? DoctorId { get; set; }
+        public Doctor? Doctor { get; set; }
+
+        public int? AssistantId { get; set; }
+        public Assistant? Assistant { get; set; }
+
         public ICollection<Feedback> Feedbacks { get; set; }= new List<Feedback>();
+        public ICollection<TaskSubmission> TaskSubmissions { get; set; }=new List<TaskSubmission>();
 
     }
 }

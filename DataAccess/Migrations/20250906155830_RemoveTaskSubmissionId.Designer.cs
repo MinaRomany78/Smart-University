@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250906155830_RemoveTaskSubmissionId")]
+    partial class RemoveTaskSubmissionId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,7 +151,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "61ce6051-01f4-48dd-ab49-7eccc8073c90",
+                            ConcurrencyStamp = "b8734c16-11ee-4526-b291-f776dc86bf11",
                             Email = "ahmed@test.com",
                             EmailConfirmed = true,
                             FirstName = "Ahmed",
@@ -159,7 +162,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "AHMED@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f8fef1f5-6c75-4b63-8591-55d294a3b8bc",
+                            SecurityStamp = "d729f4d6-29c7-45c3-a391-f7bbedd2409e",
                             TwoFactorEnabled = false,
                             UserName = "ahmed@test.com"
                         },
@@ -167,7 +170,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-101",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "39f4638e-255c-4e93-93f5-df64fe8ad324",
+                            ConcurrencyStamp = "473a2da4-51a0-434a-8aa0-ae7cb204d4e5",
                             Email = "mona@test.com",
                             EmailConfirmed = true,
                             FirstName = "Mona",
@@ -178,7 +181,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "MONA@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "19fefa9e-9d77-43ea-b73a-d35eb8f77fa6",
+                            SecurityStamp = "471e76b3-e1bc-4b68-abde-359a693490b6",
                             TwoFactorEnabled = false,
                             UserName = "mona@test.com"
                         },
@@ -186,7 +189,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-102",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4681354a-e710-4e24-8951-4080a73ddb0d",
+                            ConcurrencyStamp = "a87fa382-c255-4fb0-bef0-ea082bfa15ba",
                             Email = "hossam@test.com",
                             EmailConfirmed = true,
                             FirstName = "Hossam",
@@ -197,7 +200,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "HOSSAM@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "56ca53e8-c0ba-4567-bf0b-2bc8133c5bff",
+                            SecurityStamp = "a6cacf26-58ed-4810-967c-ed49c515322e",
                             TwoFactorEnabled = false,
                             UserName = "hossam@test.com"
                         },
@@ -205,7 +208,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-103",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "47967aaf-de73-4901-b362-55036f72164a",
+                            ConcurrencyStamp = "27c4ed33-24f9-4467-b969-3e0c7eded92c",
                             Email = "sara@test.com",
                             EmailConfirmed = true,
                             FirstName = "Sara",
@@ -216,7 +219,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "SARA@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e0b9bcb7-f961-404d-8c19-534cdd69cb57",
+                            SecurityStamp = "3cb568f3-015d-43be-ad62-913827a4a08c",
                             TwoFactorEnabled = false,
                             UserName = "sara@test.com"
                         },
@@ -224,7 +227,7 @@ namespace DataAccess.Migrations
                         {
                             Id = "inst-user-104",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0ce22a48-3dec-473b-aed3-3fbac405542e",
+                            ConcurrencyStamp = "88b41de9-acdd-4193-91df-bd2cadbb9410",
                             Email = "khaled@test.com",
                             EmailConfirmed = true,
                             FirstName = "Khaled",
@@ -235,7 +238,7 @@ namespace DataAccess.Migrations
                             NormalizedUserName = "KHALED@TEST.COM",
                             PasswordHash = "FAKE_HASH",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "34b09941-f129-44e1-b78a-9ca5e9953589",
+                            SecurityStamp = "cbfc80d1-c8b8-4acb-a80a-1d47e1b0bec1",
                             TwoFactorEnabled = false,
                             UserName = "khaled@test.com"
                         });

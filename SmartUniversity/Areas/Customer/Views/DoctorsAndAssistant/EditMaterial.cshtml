@@ -1,17 +1,17 @@
 ﻿@model Entities.ViewModel.MaterialVM
-
 @{
     ViewData["Title"] = "Edit Material";
     Layout = "~/Views/Shared/_CourseLayout.cshtml";
+    var color = ViewData["Color"]?.ToString() ?? "#0d6efd";
 }
 
-<div class="container mt-4">
-    <h3 class="mb-4">✏️ Edit Material</h3>
+<div class="container mt-4" style="max-width: 700px;">
+    <h3 class="mb-4" style="color:@color;">✏️ Edit Material</h3>
 
     <form asp-action="EditMaterial" method="post">
-        @* Hidden fields *@
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="UniversityCourseID" />
+        <input type="hidden" name="color" value="@color" />
 
         <div class="mb-3">
             <label asp-for="MaterialLink" class="form-label">Material Link</label>
@@ -19,7 +19,7 @@
             <span asp-validation-for="MaterialLink" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">💾 Update</button>
+        <button type="submit" class="btn" style="background-color:@color; color:#fff;">💾 Update</button>
         <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
     </form>
 </div>

@@ -1,0 +1,79 @@
+﻿@model Entities.ViewModel.TaskVM
+@{
+    ViewData["Title"] = "Edit Task";
+    Layout = "~/Views/Shared/_CourseLayout.cshtml";
+    var courseId = Model.UniversityCourseID;
+    var color = ViewData["Color"]?.ToString() ?? "#0d6efd";
+}
+
+<div class="container mt-4" style="max-width:700px;">
+    <div class="card shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <h4 class="fw-bold mb-4 d-flex align-items-center" style="color:@color;">
+                <i class="bi bi-pencil-square me-2"></i> Edit Task
+            </h4>
+
+            <form asp-action="EditTask" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="UniversityCourseID" />
+                <input type="hidden" name="color" value="@color" />
+
+                <!-- Title -->
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label fw-semibold"></label>
+                    <input asp-for="Title" class="form-control rounded-3" placeholder="Enter task title..." />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-semibold"></label>
+                    <textarea asp-for="Description" class="form-control rounded-3" rows="4" placeholder="Enter task details..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- Deadline -->
+                <div class="mb-3">
+                    <label asp-for="Deadline" class="form-label fw-semibold"></label>
+                    <input type="datetime-local" class="form-control rounded-3"
+                           asp-for="Deadline"
+                           value="@Model.Deadline.ToString("yyyy-MM-ddTHH:mm")" step="60" />
+                    <span asp-validation-for="Deadline" class="text-danger"></span>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Tasks"
+                       asp-route-courseId="@courseId"
+                       asp-route-color="@color"
+                       class="btn btn-outline-secondary rounded-pill px-3">
+                        <i class="bi bi-x-circle me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-dynamic rounded-pill px-4">
+                        <i class="bi bi-check-circle me-1"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section Styles {
+    <style>
+        .btn-dynamic {
+            background-color: @color;
+            border: none;
+            color: #fff;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .btn-dynamic:hover {
+                opacity: 0.9;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            }
+    </style>
+}

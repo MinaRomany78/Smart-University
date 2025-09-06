@@ -1,0 +1,55 @@
+﻿@model Entities.ViewModel.TaskSubmissionCreateVM
+@{
+    ViewData["Title"] = "Submit Task";
+    Layout = "~/Views/Shared/_CourseLayout.cshtml";
+    var color = Model.Color ?? "#0d6efd";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <h3 class="fw-bold mb-3" style="color:@color;">
+                <i class="bi bi-upload me-2"></i> Submit Task
+            </h3>
+
+            <form asp-action="SubmitTask" method="post">
+                <input type="hidden" asp-for="TaskId" />
+                <input type="hidden" asp-for="CourseId" />
+                <input type="hidden" asp-for="Color" />
+
+                <div class="mb-3">
+                    <label asp-for="SubmissionLink" class="form-label fw-semibold">Submission Link</label>
+                    <input asp-for="SubmissionLink" class="form-control" placeholder="Paste your link here..." />
+                    <span asp-validation-for="SubmissionLink" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Tasks" asp-route-courseId="@Model.CourseId" asp-route-color="@Model.Color"
+                       class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="bi bi-arrow-left me-1"></i> Back
+                    </a>
+
+                    <button type="submit" class="btn btn-dynamic rounded-pill px-4">
+                        <i class="bi bi-send me-1"></i> Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .btn-dynamic {
+            background-color: @color;
+            border: none;
+            color: #fff;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .btn-dynamic:hover {
+                opacity: 0.9;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            }
+    </style>
+}
