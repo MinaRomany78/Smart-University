@@ -87,7 +87,5 @@ namespace SmartUniversity.Areas.Customer.Controllers
             TempData["success-notification"] = "Your request has been sent to the admin. They will contact you via email.";
             return RedirectToAction(nameof(Index));
         }
-
-
     }
 }

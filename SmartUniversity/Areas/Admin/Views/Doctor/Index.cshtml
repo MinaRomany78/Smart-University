@@ -3,53 +3,182 @@
     ViewData["Title"] = "Manage Doctors";
 }
 
-
 <style>
+    /* Container and table styling */
     .dashboard-table {
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        background-color: #fff;
+        border: 1px solid #e3e6f0;
     }
 
         .dashboard-table thead {
-            background: linear-gradient(45deg, #0d6efd, #0b5ed7);
-            color: white;
-            font-weight: 600;
+            background: linear-gradient(90deg, #4e73df, #224abe);
+            color: #fff;
+            font-weight: 700;
             text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
         }
 
+            .dashboard-table thead th {
+                border: none;
+                padding: 16px 20px;
+                white-space: nowrap;
+            }
+
         .dashboard-table tbody tr {
-            transition: all 0.2s ease-in-out;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: default;
         }
 
             .dashboard-table tbody tr:hover {
-                background-color: #f8f9fa;
-                transform: scale(1.01);
+                background-color: #f8f9fc;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(78, 115, 223, 0.15);
             }
 
-        .dashboard-table td,
-        .dashboard-table th {
-            padding: 14px 16px;
+        .dashboard-table tbody td {
+            padding: 14px 20px;
             vertical-align: middle;
+            font-size: 0.9rem;
+            color: #3a3b45;
+            border-top: 1px solid #e3e6f0;
+            white-space: nowrap;
         }
 
+            .dashboard-table tbody td.fw-bold {
+                color: #224abe;
+            }
+
+    /* Actions buttons */
     .table-actions .btn {
         border-radius: 8px;
-        padding: 6px 10px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: none;
+        white-space: nowrap;
     }
 
+    .table-actions .btn-warning {
+        background-color: #f6c23e;
+        border-color: #f6c23e;
+        color: #212529;
+    }
+
+        .table-actions .btn-warning:hover {
+            background-color: #dda20a;
+            border-color: #dda20a;
+            box-shadow: 0 0 8px rgba(221, 162, 10, 0.6);
+            color: #212529;
+        }
+
+    .table-actions .btn-danger {
+        background-color: #e74a3b;
+        border-color: #e74a3b;
+        color: #fff;
+    }
+
+        .table-actions .btn-danger:hover {
+            background-color: #b02a1a;
+            border-color: #b02a1a;
+            box-shadow: 0 0 8px rgba(176, 42, 26, 0.6);
+            color: #fff;
+        }
+
+    /* Block/Unblock buttons */
+    .btn-block, .btn-unblock {
+        border-radius: 8px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        padding: 6px 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-block {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: #fff;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .btn-block:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            box-shadow: 0 0 8px rgba(92, 99, 104, 0.6);
+            color: #fff;
+        }
+
+    .btn-unblock {
+        background-color: #1cc88a;
+        border-color: #1cc88a;
+        color: #fff;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .btn-unblock:hover {
+            background-color: #17a673;
+            border-color: #17a673;
+            box-shadow: 0 0 8px rgba(23, 166, 115, 0.6);
+            color: #fff;
+        }
+
+    /* Search box styling */
     .search-box {
-        margin-bottom: 16px;
-        max-width: 300px;
+        max-width: 320px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        padding-left: 40px;
+        font-size: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #ced4da;
+        background: url('data:image/svg+xml;utf8,<svg fill="gray" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/></svg>') no-repeat 12px center;
+        background-size: 16px 16px;
     }
 
+        .search-box:focus {
+            outline: none;
+            border-color: #4e73df;
+            box-shadow: 0 0 8px rgba(78, 115, 223, 0.5);
+            background-color: #fff;
+        }
+
+    /* Pagination */
+    .pagination {
+        justify-content: center;
+        margin-top: 30px;
+    }
+
+        .pagination .page-item.active .page-link {
+            background-color: #4e73df;
+            border-color: #4e73df;
+            color: #fff;
+            box-shadow: 0 0 8px rgba(78, 115, 223, 0.6);
+        }
+
+        .pagination .page-link {
+            color: #4e73df;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 14px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+            .pagination .page-link:hover {
+                background-color: #e7f0fe;
+                color: #224abe;
+            }
 </style>
 
 <div class="mt-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <input id="doctorSearch" type="text" class="form-control search-box" placeholder="🔍 Search doctors..." />
-        <a href="@Url.Action("Create", "Doctor", new { area = "Admin" })" class="btn btn-success shadow-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add Doctor
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+        <input id="doctorSearch" type="text" class="form-control search-box" placeholder="Search doctors..." />
+        <a href="@Url.Action("Create", "Doctor", new { area = "Admin" })" class="btn btn-primary shadow-sm px-4">
+            <i class="bi bi-plus-circle me-2"></i> Add Doctor
         </a>
     </div>
 
@@ -86,14 +215,14 @@
                             @if (doctor.ApplicationUser.LockoutEnd is not null && doctor.ApplicationUser.LockoutEnd > DateTime.Now)
                             {
                                 <a href="@Url.Action("ToggleBlock", "LockUnlock", new { id = doctor.ApplicationUser.Id, area = "Admin", returnController = ViewContext.RouteData.Values["controller"] })"
-                                   class="btn btn-success btn-sm">
+                                   class="btn btn-unblock btn-sm">
                                     <i class="bi bi-unlock"></i> Unblock
                                 </a>
                             }
                             else
                             {
                                 <a href="@Url.Action("ToggleBlock", "LockUnlock", new { id = doctor.ApplicationUser.Id, area = "Admin", returnController = ViewContext.RouteData.Values["controller"] })"
-                                   class="btn btn-secondary btn-sm">
+                                   class="btn btn-block btn-sm">
                                     <i class="bi bi-lock"></i> Block
                                 </a>
                             }
@@ -105,18 +234,18 @@
     </div>
 
     @* Pagination *@
-        <nav aria-label="Doctors pagination" class="mt-4">
-            <ul class="pagination justify-content-center">
-                @for (int i = 1; i <= (int)ViewBag.totalPages; i++)
-                {
-                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", "doctor", new { area = "Admin", page = i })">
-                            @i
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
+    <nav aria-label="Doctors pagination" class="mt-4">
+        <ul class="pagination">
+            @for (int i = 1; i <= (int)ViewBag.totalPages; i++)
+            {
+                <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Doctor", new { area = "Admin", page = i })">
+                        @i
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
 </div>
 
 @section Scripts {
@@ -126,17 +255,17 @@
             @* Success Message *@
             @if (TempData["success-notification"] != null)
             {
-                        <text>
-                            toastr.success('@TempData["success-notification"]');
-                        </text>
+                    <text>
+                        toastr.success('@TempData["success-notification"]');
+                    </text>
             }
 
             @* Error Message *@
             @if (TempData["error-notification"] != null)
             {
-                        <text>
-                            toastr.error('@TempData["error-notification"]');
-                        </text>
+                    <text>
+                        toastr.error('@TempData["error-notification"]');
+                    </text>
             }
         });
     </script>

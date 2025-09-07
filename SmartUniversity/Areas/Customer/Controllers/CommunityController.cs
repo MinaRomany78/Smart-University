@@ -54,6 +54,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         [Authorize]
         public async Task<IActionResult> CreatePost(CreatePostVM vm, string color)
         {
+           
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound();
 
