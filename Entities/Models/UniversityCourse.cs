@@ -12,7 +12,6 @@ namespace Entities.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int CreditHours { get; set; }
-       // public string Term { get; set; } = string.Empty;
         public ICollection<Enrollment> Enrollments { get; } = new List<Enrollment>();
         public ICollection<Material> Materials { get; } = new List<Material>();
         public ICollection<SubjectTask> Tasks { get; } = new List<SubjectTask>();
