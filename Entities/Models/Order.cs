@@ -17,7 +17,5 @@ namespace Entities.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? PromoCodeId { get; set; }
         public PromoCode? PromoCode { get; set; }
-
-        
     }
 }

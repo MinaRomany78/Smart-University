@@ -1,53 +1,154 @@
-﻿@model IEnumerable<ApplicationUser>
+﻿@model IEnumerable<ApplicationUser >
 @{
     ViewData["Title"] = "Manage External Students";
 }
 
 <style>
+    /* Container and table styling */
     .dashboard-table {
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        background-color: #fff;
+        border: 1px solid #d1e7dd;
     }
 
         .dashboard-table thead {
-            background: linear-gradient(45deg, #20c997, #0ca678);
-            color: white;
-            font-weight: 600;
+            background: linear-gradient(90deg, #20c997, #0ca678);
+            color: #fff;
+            font-weight: 700;
             text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
         }
 
+            .dashboard-table thead th {
+                border: none;
+                padding: 16px 20px;
+            }
+
         .dashboard-table tbody tr {
-            transition: all 0.2s ease-in-out;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: default;
         }
 
             .dashboard-table tbody tr:hover {
-                background-color: #f8f9fa;
-                transform: scale(1.01);
+                background-color: #e6f4ea;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(32, 201, 151, 0.15);
             }
 
-        .dashboard-table td,
-        .dashboard-table th {
-            padding: 14px 16px;
+        .dashboard-table tbody td {
+            padding: 14px 20px;
             vertical-align: middle;
+            font-size: 0.9rem;
+            color: #2f3e46;
+            border-top: 1px solid #d1e7dd;
         }
 
+            .dashboard-table tbody td.fw-bold {
+                color: #0ca678;
+            }
+
+    /* Actions buttons */
     .table-actions .btn {
         border-radius: 8px;
-        padding: 6px 10px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: none;
     }
 
+    .table-actions .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+    }
+
+        .table-actions .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+            box-shadow: 0 0 8px rgba(224, 168, 0, 0.6);
+            color: #212529;
+        }
+
+    .table-actions .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: #fff;
+    }
+
+        .table-actions .btn-danger:hover {
+            background-color: #a71d2a;
+            border-color: #a71d2a;
+            box-shadow: 0 0 8px rgba(167, 29, 42, 0.6);
+            color: #fff;
+        }
+
+    /* Search box styling */
     .search-box {
-        margin-bottom: 16px;
-        max-width: 300px;
+        max-width: 320px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        padding-left: 40px;
+        font-size: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #ced4da;
+        background: url('data:image/svg+xml;utf8,<svg fill="gray" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/></svg>') no-repeat 12px center;
+        background-size: 16px 16px;
+    }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #20c997;
+            box-shadow: 0 0 8px rgba(32, 201, 151, 0.5);
+            background-color: #fff;
+        }
+
+    /* Pagination */
+    .pagination {
+        justify-content: center;
+        margin-top: 30px;
+    }
+
+        .pagination .page-item.active .page-link {
+            background-color: #20c997;
+            border-color: #20c997;
+            color: #fff;
+            box-shadow: 0 0 8px rgba(32, 201, 151, 0.6);
+        }
+
+        .pagination .page-link {
+            color: #20c997;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 14px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+            .pagination .page-link:hover {
+                background-color: #d1f2e9;
+                color: #0ca678;
+            }
+
+    /* Badge for role */
+    .badge-external {
+        background-color: #0ca678;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.35em 0.65em;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 </style>
 
 <div class="mt-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <input id="studentSearch" type="text" class="form-control search-box" placeholder="🔍 Search external students..." />
-        <a href="@Url.Action("Create", "ExternalStudent", new { area = "Admin" })" class="btn btn-success shadow-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add External Student
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+        <input id="studentSearch" type="text" class="form-control search-box" placeholder="Search external students..." />
+        <a href="@Url.Action("Create", "ExternalStudent", new { area = "Admin" })" class="btn btn-success shadow-sm px-4">
+            <i class="bi bi-plus-circle me-2"></i> Add External Student
         </a>
     </div>
 
@@ -70,7 +171,7 @@
                         <td>@student.Email</td>
                         <td>@student.UserName</td>
                         <td>
-                            <span class="badge bg-info text-dark">External</span>
+                            <span class="badge-external">External</span>
                         </td>
                         <td class="table-actions">
                             <a href="@Url.Action("Edit", "ExternalStudent", new { id = student.Id, area = "Admin" })"
@@ -91,7 +192,7 @@
 
     @* Pagination *@
     <nav aria-label="Students pagination" class="mt-4">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination">
             @for (int i = 1; i <= (int)ViewBag.totalPages; i++)
             {
                 <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
@@ -111,17 +212,17 @@
             @* Success Message *@
             @if (TempData["success-notification"] != null)
             {
-                                <text>
-                                    toastr.success('@TempData["success-notification"]');
-                                </text>
+                    <text>
+                        toastr.success('@TempData["success-notification"]');
+                    </text>
             }
 
             @* Error Message *@
             @if (TempData["error-notification"] != null)
             {
-                                <text>
-                                    toastr.error('@TempData["error-notification"]');
-                                </text>
+                    <text>
+                        toastr.error('@TempData["error-notification"]');
+                    </text>
             }
         });
     </script>

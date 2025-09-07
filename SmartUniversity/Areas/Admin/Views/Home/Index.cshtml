@@ -4,7 +4,7 @@
 }
 
 @section Breadcrumb {
-    <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a></li>
             <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
@@ -12,95 +12,128 @@
     </nav>
 }
 @section PageActions {
-    <a class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>New User</a>
-    <a class="btn btn-outline-secondary"><i class="bi bi-upload me-2"></i>Import</a>
+    <a class="btn btn-primary me-2"><i class="bi bi-plus-lg me-1"></i>New User</a>
+    <a class="btn btn-outline-secondary"><i class="bi bi-upload me-1"></i>Import</a>
 }
 
-<div class="row g-3">
-    <!-- KPI Cards -->
-    <div class="col-sm-6 col-xl-2">
-        <div class="card card-soft p-3 kpi kpi-accent-1">
-            <div class="d-flex align-items-center justify-content-between">
+<div class="row g-4 mb-4">
+    <!-- KPI Cards: 6 cards in two rows for better spacing -->
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
-                    <div class="text-muted-2">Students</div>
-                    <div class="value fw-semibold">@ViewBag.totalStudents</div>
+                    <small class="text-muted text-uppercase">Students</small>
+                    <h4 class="mb-0 fw-bold">@ViewBag.totalStudents</h4>
                 </div>
-                <i class="bi bi-person-badge fs-2"></i>
+                <i class="bi bi-person-badge fs-2 text-primary"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-2">
-        <div class="card card-soft p-3 kpi kpi-accent-2">
-            <div class="d-flex align-items-center justify-content-between">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
-                    <div class="text-muted-2">Doctors</div>
-                    <div class="value fw-semibold">@ViewBag.totalDoctors</div>
+                    <small class="text-muted text-uppercase">Doctors</small>
+                    <h4 class="mb-0 fw-bold">@ViewBag.totalDoctors</h4>
                 </div>
-                <i class="bi bi-person-video3 fs-2"></i>
+                <i class="bi bi-person-video3 fs-2 text-success"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-2">
-        <div class="card card-soft p-3 kpi kpi-accent-3">
-            <div class="d-flex align-items-center justify-content-between">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
-                    <div class="text-muted-2">Assistants</div>
-                    <div class="value fw-semibold">@ViewBag.totalAssistants</div>
+                    <small class="text-muted text-uppercase">Assistants</small>
+                    <h4 class="mb-0 fw-bold">@ViewBag.totalAssistants</h4>
                 </div>
-                <i class="bi bi-person-workspace fs-2"></i>
+                <i class="bi bi-person-workspace fs-2 text-info"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card card-soft p-3 kpi kpi-accent-4">
-            <div class="d-flex align-items-center justify-content-between">
+    <div class="col-6 col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
-                    <div class="text-muted-2">Courses</div>
-                    <div class="value fw-semibold">@ViewBag.totalCourses</div>
+                    <small class="text-muted text-uppercase">Courses</small>
+                    <h4 class="mb-0 fw-bold">@ViewBag.totalCourses</h4>
                 </div>
-                <i class="bi bi-journal-text fs-2"></i>
+                <i class="bi bi-journal-text fs-2 text-warning"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card card-soft p-3 kpi kpi-accent-1">
-            <div class="d-flex align-items-center justify-content-between">
+    <div class="col-6 col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
-                    <div class="text-muted-2">Optional Courses</div>
-                    <div class="value fw-semibold">@ViewBag.totalOptionalCourses</div>
+                    <small class="text-muted text-uppercase">Optional Courses</small>
+                    <h4 class="mb-0 fw-bold">@ViewBag.totalOptionalCourses</h4>
                 </div>
-                <i class="bi bi-journals fs-2"></i>
+                <i class="bi bi-journals fs-2 text-danger"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Left big chart -->
+    <div class="col-xl-8 col-lg-12">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Enrollment Growth</h5>
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="lineChart" width="700" height="280" style="max-width: 100%;"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Charts -->
-    <div class="col-xl-8">
-        <div class="card card-soft p-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <h2 class="h6 mb-0">Enrollment Growth</h2>
+    <!-- Right side: two charts stacked -->
+    <div class="col-xl-4 d-flex flex-column gap-4">
+        <div class="card shadow-sm border-0 flex-fill">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0">Optional Courses Revenue</h5>
             </div>
-            <canvas id="lineChart" height="120"></canvas>
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="revenueChart" width="350" height="220" style="max-width: 100%;"></canvas>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 flex-fill">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0">Department Distribution</h5>
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="donutChart" width="350" height="220" style="max-width: 100%;"></canvas>
+            </div>
         </div>
     </div>
-    <div class="col-xl-4">
-        <div class="card card-soft p-3">
-            <h2 class="h6">Distribution</h2>
-            <canvas id="donutChart" height="200"></canvas>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Users & Courses Distribution chart full width -->
+    <div class="col-12 col-xl-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0">Users & Courses Distribution</h5>
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="donutChart2" width="500" height="350" style="max-width: 100%;"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- Recent Tickets -->
-    <div class="col-12">
-        <div class="card card-soft p-0 table-card">
-            <div class="p-3 d-flex align-items-center justify-content-between">
-                <h2 class="h6 mb-0">Recent Support Tickets</h2>
+    <!-- Recent Tickets Table -->
+    <div class="col-12 col-xl-6">
+        <div class="card shadow-sm border-0 h-100 d-flex flex-column">
+            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Recent Support Tickets</h5>
                 <a asp-area="Admin" asp-controller="SupportTicket" asp-action="Index" class="btn btn-sm btn-outline-primary">
                     View All
                 </a>
             </div>
-            <div class="table-responsive p-3 pt-0">
-                <table id="ticketsTable" class="table table-hover align-middle w-100">
+            <div class="table-responsive flex-grow-1">
+                <table id="ticketsTable" class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>From</th>
@@ -123,7 +156,7 @@
                                     }
                                     else if (ticket.Priority == TicketPriority.Medium)
                                     {
-                                        <span class="badge bg-warning">Medium</span>
+                                        <span class="badge bg-warning text-dark">Medium</span>
                                     }
                                     else
                                     {
@@ -137,7 +170,7 @@
                                     }
                                     else if (ticket.Status == TicketStatus.InProgress)
                                     {
-                                        <span class="badge bg-info">In Progress</span>
+                                        <span class="badge bg-info text-dark">In Progress</span>
                                     }
                                     else if (ticket.Status == TicketStatus.Resolved)
                                     {
@@ -159,38 +192,133 @@
 </div>
 
 <!-- Chart.js + DataTables -->
-<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
-<script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-    // Line Chart (dummy data for now)
-    const lineCtx = document.getElementById('lineChart');
-    if (lineCtx) {
-        new Chart(lineCtx, {
-            type: 'line',
+    // Revenue by Month (Bar Chart)
+    const revenueByMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.revenueByMonth));
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx && revenueByMonth.length > 0) {
+        new Chart(revenueCtx, {
+            type: 'bar',
             data: {
-                labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],
+                labels: revenueByMonth.map(r => r.Period),
                 datasets: [{
-                    label: 'Enrollments',
-                    data: [50, 120, 200, 300, 450, 600, 750, 900],
-                    fill: true,
-                    tension: .35,
+                    label: 'Revenue (EGP)',
+                    data: revenueByMonth.map(r => r.TotalRevenue),
+                    backgroundColor: 'rgba(78, 115, 223, 0.5)',
+                    borderColor: '#4e73df',
                     borderWidth: 2
                 }]
             },
             options: {
+                responsive: false,
                 plugins: { legend: { display: false } },
                 scales: { y: { beginAtZero: true } }
             }
         });
     }
 
-    // Donut Chart
+    // Enrollment Growth (Line Chart)
+    const enrollmentGrowth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.enrollmentGrowth));
+    const lineCtx = document.getElementById('lineChart');
+    if (lineCtx && enrollmentGrowth.length > 0) {
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: enrollmentGrowth.map(e => e.Period),
+                datasets: [
+                    {
+                        label: 'Total Enrollments',
+                        data: enrollmentGrowth.map(e => e.Count),
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78,115,223,0.1)',
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    },
+                    {
+                        label: 'Paid',
+                        data: enrollmentGrowth.map(e => e.Paid),
+                        borderColor: '#1cc88a',
+                        backgroundColor: 'rgba(28,200,138,0.1)',
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    },
+                    {
+                        label: 'Not Paid',
+                        data: enrollmentGrowth.map(e => e.NotPaid),
+                        borderColor: '#e74a3b',
+                        backgroundColor: 'rgba(231,74,59,0.1)',
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                interaction: { mode: 'nearest', intersect: false },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // Department Distribution (Donut Chart)
+    const deptDist = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.deptDist));
     const donutCtx = document.getElementById('donutChart');
-    if (donutCtx) {
+    if (donutCtx && deptDist.length > 0) {
         new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: deptDist.map(d => d.Dept),
+                datasets: [{
+                    data: deptDist.map(d => d.Count),
+                    backgroundColor: [
+                        '#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#858796','#5a5c69'
+                    ]
+                }]
+            },
+            options: {
+                responsive: false,
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { enabled: true }
+                },
+                cutout: '65%'
+            }
+        });
+    }
+
+    // Users & Courses Distribution (Second Donut Chart)
+    const donutCtx2 = document.getElementById('donutChart2');
+    if (donutCtx2) {
+        new Chart(donutCtx2, {
             type: 'doughnut',
             data: {
                 labels: ['Students','Doctors','Assistants','Courses','Optional Courses'],
@@ -201,24 +329,43 @@
                         @ViewBag.totalAssistants,
                         @ViewBag.totalCourses,
                         @ViewBag.totalOptionalCourses
+                    ],
+                    backgroundColor: [
+                        '#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b'
                     ]
                 }]
             },
             options: {
-                plugins: { legend: { position: 'bottom' } },
+                responsive: false,
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { enabled: true }
+                },
                 cutout: '65%'
             }
         });
     }
 
-    // DataTables
-    new DataTable('#ticketsTable', {
-        paging: true,
-        searching: true,
-        info: false,
-        lengthChange: false
+    // DataTables (Tickets)
+    $(document).ready(function () {
+        $('#ticketsTable').DataTable({
+            paging: true,
+            searching: true,
+            info: false,
+            lengthChange: false,
+            order: [[4, 'desc']],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search tickets..."
+            }
+        });
     });
 </script>
+
 
 
 

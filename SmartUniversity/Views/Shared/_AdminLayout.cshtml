@@ -29,34 +29,106 @@
         <i class="bi bi-layout-sidebar-inset"></i>
       </button>
     </div>
-    <nav class="nav flex-column px-2" role="navigation" aria-label="Primary">
-      <div class="nav-section text-uppercase text-muted small px-2">Overview</div>
-            <a class="nav-link active" asp-area="Admin" asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i><span>Dashboard</span></a>
+        @{
+            var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+        }
 
-      <div class="nav-section text-uppercase text-muted small px-2 mt-3">People</div>
-            <a class="nav-link" asp-area="Admin" asp-controller="ManageAdmin" asp-action="Index"><i class="bi bi-people me-2"></i><span>Admins</span></a>
+        <style>
+            /* Rotate chevron when menu is open */
+            .nav-link[aria-expanded="true"] .bi-chevron-down {
+                transform: rotate(180deg);
+                transition: transform 0.3s ease;
+            }
 
-            <a class="nav-link" asp-area="Admin" asp-controller="Application" asp-action="Index"><i class="bi bi-people me-2"></i><span>Applications</span></a>
-            <a class="nav-link" asp-area="Admin" asp-controller="UniversityStudent" asp-action="Index"><i class="bi bi-person-badge me-2"></i><span>Students</span></a>
-      <a class="nav-link" asp-area="Admin" asp-controller="Doctor" asp-action="Index"><i class="bi bi-person-video3 me-2"></i><span>Doctors</span></a>
-      <a class="nav-link" asp-area="Admin" asp-controller="Assistant" asp-action="Index"><i class="bi bi-person-workspace me-2"></i><span>Assistants</span></a>
-            <a class="nav-link" asp-area="Admin" asp-controller="Instructor" asp-action="Index"><i class="bi bi-person-workspace me-2"></i><span>Instructors</span></a>
-            <a class="nav-link" asp-area="Admin" asp-controller="ExternalStudent" asp-action="Index"><i class="bi bi-person-lines-fill me-2"></i><span>Non-Students</span></a>
+            .nav-link .bi-chevron-down {
+                transition: transform 0.3s ease;
+            }
+        </style>
 
-      <div class="nav-section text-uppercase text-muted small px-2 mt-3">Academics</div>
-      <a class="nav-link" asp-area="Admin" asp-controller="Department" asp-action="Index"><i class="bi bi-diagram-3 me-2"></i><span>Departments</span></a>
-      <a class="nav-link" asp-area="Admin" asp-controller="Course" asp-action="Index"><i class="bi bi-journal-text me-2"></i><span>Courses</span></a>
-            <a class="nav-link" asp-area="Admin" asp-controller="OptionalCourse" asp-action="Index"><i class="bi bi-journal-text me-2"></i><span>Optional Courses</span></a>
-            <a class="nav-link" asp-area="Admin" asp-controller="PromoCode" asp-action="Index"><i class="bi bi-journal-text me-2"></i><span>PromoCodes</span></a>
-      <a class="nav-link" asp-area="Admin" asp-controller="Sections" asp-action="Index"><i class="bi bi-grid-3x3-gap me-2"></i><span>Sections</span></a>
-      <a class="nav-link" asp-area="Admin" asp-controller="Scheduling" asp-action="Index"><i class="bi bi-calendar-week me-2"></i><span>Scheduling</span></a>
+        <nav class="nav flex-column px-2" role="navigation" aria-label="Primary">
 
-      <div class="nav-section text-uppercase text-muted small px-2 mt-3">System</div>
-            <a class="nav-link" asp-area="Admin" asp-controller="SupportTicket" asp-action="Index"><i class="bi bi-door-open me-2"></i><span>Support Tickets</span></a>
-      <a class="nav-link" asp-area="Admin" asp-controller="Finance" asp-action="Index"><i class="bi bi-cash-coin me-2"></i><span>Finance</span></a>
-      <a class="nav-link" asp-area="Admin" asp-controller="Reports" asp-action="Index"><i class="bi bi-bar-chart-line me-2"></i><span>Reports</span></a>
-      <a class="nav-link" asp-area="Admin" asp-controller="Settings" asp-action="Index"><i class="bi bi-gear-wide-connected me-2"></i><span>Settings</span></a>
-    </nav>
+            <!-- Dashboard -->
+            <div class="nav-section text-uppercase text-muted small px-2">Overview</div>
+            <a class="nav-link @(currentController == "Home" ? "active" : "")"
+               asp-area="Admin" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-speedometer2 me-2"></i><span>Dashboard</span>
+            </a>
+
+            <!-- Students -->
+            <a class="nav-link d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#studentMenu" role="button"
+               aria-expanded="@(new[] { "UniversityStudent", "ExternalStudent", "Application" }.Contains(currentController).ToString().ToLower())"
+               aria-controls="studentMenu">
+                <span><i class="bi bi-person-badge me-2"></i> Students</span>
+                <i class="bi bi-chevron-down small"></i>
+            </a>
+            <div class="collapse ps-3 @(new[] { "UniversityStudent", "ExternalStudent", "Application" }
+                          .Contains(currentController) ? "show" : "")" id="studentMenu">
+                <a class="nav-link @(currentController == "UniversityStudent" ? "active" : "")"
+                   asp-area="Admin" asp-controller="UniversityStudent" asp-action="Index">University Students</a>
+                <a class="nav-link @(currentController == "ExternalStudent" ? "active" : "")"
+                   asp-area="Admin" asp-controller="ExternalStudent" asp-action="Index">Non-Students</a>
+                <a class="nav-link @(currentController == "Application" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Application" asp-action="Index">Applications</a>
+            </div>
+
+            <!-- Staff -->
+            <a class="nav-link d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#staffMenu" role="button"
+               aria-expanded="@(new[] { "Doctor", "Assistant", "Instructor", "ManageAdmin" }.Contains(currentController).ToString().ToLower())"
+               aria-controls="staffMenu">
+                <span><i class="bi bi-people me-2"></i> Staff</span>
+                <i class="bi bi-chevron-down small"></i>
+            </a>
+            <div class="collapse ps-3 @(new[] { "Doctor", "Assistant", "Instructor", "ManageAdmin" }
+                          .Contains(currentController) ? "show" : "")" id="staffMenu">
+                <a class="nav-link @(currentController == "Doctor" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Doctor" asp-action="Index">Doctors</a>
+                <a class="nav-link @(currentController == "Assistant" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Assistant" asp-action="Index">Assistants</a>
+                <a class="nav-link @(currentController == "Instructor" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Instructor" asp-action="Index">Instructors</a>
+                <a class="nav-link @(currentController == "ManageAdmin" ? "active" : "")"
+                   asp-area="Admin" asp-controller="ManageAdmin" asp-action="Index">Admins</a>
+            </div>
+
+            <!-- Academics -->
+            <a class="nav-link d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#academicsMenu" role="button"
+               aria-expanded="@(new[] { "Department", "Course", "OptionalCourse", "PromoCode" }.Contains(currentController).ToString().ToLower())"
+               aria-controls="academicsMenu">
+                <span><i class="bi bi-journal-text me-2"></i> Academics</span>
+                <i class="bi bi-chevron-down small"></i>
+            </a>
+            <div class="collapse ps-3 @(new[] { "Department", "Course", "OptionalCourse", "PromoCode" }
+                          .Contains(currentController) ? "show" : "")" id="academicsMenu">
+                <a class="nav-link @(currentController == "Department" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Department" asp-action="Index">Departments</a>
+                <a class="nav-link @(currentController == "Course" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Course" asp-action="Index">Courses</a>
+                <a class="nav-link @(currentController == "OptionalCourse" ? "active" : "")"
+                   asp-area="Admin" asp-controller="OptionalCourse" asp-action="Index">Optional Courses</a>
+                <a class="nav-link @(currentController == "PromoCode" ? "active" : "")"
+                   asp-area="Admin" asp-controller="PromoCode" asp-action="Index">Promo Codes</a>
+            </div>
+
+            <!-- System -->
+            <div class="nav-section text-uppercase text-muted small px-2 mt-3">System</div>
+            <a class="nav-link @(currentController == "SupportTicket" ? "active" : "")"
+               asp-area="Admin" asp-controller="SupportTicket" asp-action="Index">
+                <i class="bi bi-door-open me-2"></i> Support Tickets
+            </a>
+            <a class="nav-link @(currentController == "Finance" ? "active" : "")"
+               asp-area="Admin" asp-controller="Finance" asp-action="Index">
+                <i class="bi bi-cash-coin me-2"></i> Finance
+            </a>
+            <a class="nav-link @(currentController == "Reports" ? "active" : "")"
+               asp-area="Admin" asp-controller="Reports" asp-action="Index">
+                <i class="bi bi-bar-chart-line me-2"></i> Reports
+            </a>
+        </nav>
+
+
     <div class="mt-auto p-3 border-top small">
       <div class="d-flex align-items-center justify-content-between">
         <div class="text-muted">v1.0</div>
