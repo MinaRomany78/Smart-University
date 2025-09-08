@@ -23,12 +23,15 @@ namespace SmartUniversity.Areas.Customer.Controllers
             _userManager = userManager;
         }
 
-        // Unified action for Doctor, Assistant, Student
         [HttpGet]
         public async Task<IActionResult> Tasks(int courseId, string color)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            if (user == null)
+            {
+                TempData["error-notification"] = "User not found!";
+                return NotFound();
+            }
 
             var doctor = await _unitOfWork.Doctors.GetOneAsync(d => d.ApplicationUserId == user.Id);
             var assistant = await _unitOfWork.Assistants.GetOneAsync(a => a.ApplicationUserId == user.Id);
@@ -57,18 +60,14 @@ namespace SmartUniversity.Areas.Customer.Controllers
                          t.UniversityCourse.Enrollments.Any(e => e.StudentID == student.Id),
                     include: new Expression<Func<SubjectTask, object>>[]
                     {
-                            t => t.UniversityCourse,
-                            t => t.Feedbacks.Where(f => f.StudentID == student.Id), // 🟢 فلترة الفيدباك
-
-                            t => t.TaskSubmissions  
-                           
+                        t => t.UniversityCourse,
+                        t => t.Feedbacks.Where(f => f.StudentID == student.Id),
+                        t => t.TaskSubmissions
                     }
-                );ViewBag.StudentId = student.Id;
+                );
+                ViewBag.StudentId = student.Id;
             }
-            
 
-
-            // Sidebar highlighting + color persistence
             ViewData["ActiveTab"] = "Tasks";
             ViewData["CourseId"] = courseId;
             ViewData["Color"] = color?.StartsWith("#") == true ? color : "#" + (color ?? "0d6efd");
@@ -93,7 +92,11 @@ namespace SmartUniversity.Areas.Customer.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTask(TaskVM vm, string color)
         {
-            if (!ModelState.IsValid) return View(vm);
+            if (!ModelState.IsValid)
+            {
+                TempData["error-notification"] = "Invalid data!";
+                return View(vm);
+            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
@@ -112,7 +115,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
             };
 
             await _unitOfWork.SubjectTasks.CreateAsync(task);
-            TempData["success-notification"] = "Task added successfully!";
+            TempData["success-notification"] = "Task added successfully ✅";
 
             return RedirectToAction(nameof(Tasks), new { courseId = vm.UniversityCourseID, color });
         }
@@ -122,7 +125,11 @@ namespace SmartUniversity.Areas.Customer.Controllers
         public async Task<IActionResult> EditTask(int id, string color)
         {
             var task = await _unitOfWork.SubjectTasks.GetOneAsync(t => t.Id == id);
-            if (task == null) return NotFound();
+            if (task == null)
+            {
+                TempData["error-notification"] = "Task not found!";
+                return NotFound();
+            }
 
             var vm = new TaskVM
             {
@@ -138,18 +145,52 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> EditTask(TaskVM vm, string color)
         {
-            if (!ModelState.IsValid) return View(vm);
+            if (!ModelState.IsValid)
+            {
+                TempData["error-notification"] = "Invalid data!";
+                return View(vm);
+            }
 
-            var task = await _unitOfWork.SubjectTasks.GetOneAsync(t => t.Id == vm.Id);
-            if (task == null) return NotFound();
+            var task = await _unitOfWork.SubjectTasks.GetOneAsync(
+                t => t.Id == vm.Id,
+                include: new Expression<Func<SubjectTask, object>>[]
+                {
+            t => t.TaskSubmissions
+                }
+            );
 
+            if (task == null)
+            {
+                TempData["error-notification"] = "Task not found!";
+                return NotFound();
+            }
+
+            // 🟢 تحديث بيانات التاسك
             task.Title = vm.Title;
             task.Description = vm.Description;
             task.Deadline = vm.Deadline;
-
             await _unitOfWork.SubjectTasks.UpdateAsync(task);
+
+            // 🟢 تحديث Status بتاع كل Submission
+            if (task.TaskSubmissions != null && task.TaskSubmissions.Any())
+            {
+                foreach (var sub in task.TaskSubmissions)
+                {
+                    if (sub.SubmissionDate != null)
+                    {
+                        sub.Status = (sub.SubmissionDate <= task.Deadline)
+                            ? SubmissionStatus.OnTime
+                            : SubmissionStatus.Late;
+
+                        await _unitOfWork.TaskSubmissions.UpdateAsync(sub);
+                    }
+                }
+            }
+
+            TempData["success-notification"] = "Task updated successfully ✅";
             return RedirectToAction(nameof(Tasks), new { courseId = task.UniversityCourseID, color });
         }
 
@@ -160,51 +201,49 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
-            var student = await _unitOfWork.Students.GetOneAsync(s => s.ApplicationUserId == user.Id);
-
             var task = await _unitOfWork.SubjectTasks.GetOneAsync(
                 t => t.Id == id,
                 include: new Expression<Func<SubjectTask, object>>[]
                 {
-                    t => t.Feedbacks,
-                    t => t.TaskSubmissions
+            t => t.Feedbacks,
+            t => t.TaskSubmissions
                 }
             );
 
-            if (task == null) return NotFound();
-
-            // 🟢 امسح بس الفيدباك الخاصة بالطالب الحالي
-            if (student != null && task.Feedbacks != null && task.Feedbacks.Any())
+            if (task == null)
             {
-                var studentFeedbacks = task.Feedbacks
-                    .Where(fb => fb.StudentID == student.Id) // فلترة بالـ StudentId
-                    .ToList();
+                TempData["error-notification"] = "Task not found!";
+                return NotFound();
+            }
 
-                foreach (var fb in studentFeedbacks)
+            // 🟢 امسح كل Feedbacks
+            if (task.Feedbacks != null && task.Feedbacks.Any())
+            {
+                foreach (var fb in task.Feedbacks.ToList())
                 {
                     await _unitOfWork.Feedbacks.DeleteAsync(fb);
                 }
             }
 
-            // 🟢 لو عايز تمسح الـ submissions الخاصة بالطالب ده برضو
-            if (student != null && task.TaskSubmissions != null && task.TaskSubmissions.Any())
+            // 🟢 امسح كل Submissions
+            if (task.TaskSubmissions != null && task.TaskSubmissions.Any())
             {
-                var studentSubs = task.TaskSubmissions
-                    .Where(sub => sub.StudentID == student.Id)
-                    .ToList();
-
-                foreach (var sub in studentSubs)
+                foreach (var sub in task.TaskSubmissions.ToList())
                 {
                     await _unitOfWork.TaskSubmissions.DeleteAsync(sub);
                 }
             }
 
-            // 🟢 بعد كده امسح التاسك نفسه
+            // 🟢 امسح التاسك نفسه
             bool status = await _unitOfWork.SubjectTasks.DeleteAsync(task);
 
             if (status)
+            {
+                TempData["success-notification"] = "Task and all related data deleted successfully 🗑️";
                 return RedirectToAction(nameof(Tasks), new { courseId, color });
+            }
 
+            TempData["error-notification"] = "Failed to delete task!";
             return View(task);
         }
 
@@ -222,11 +261,14 @@ namespace SmartUniversity.Areas.Customer.Controllers
             return View(vm);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> SubmitTask(TaskSubmissionCreateVM vm)
         {
-            if (!ModelState.IsValid) return View(vm);
+            if (!ModelState.IsValid)
+            {
+                TempData["error-notification"] = "Invalid submission data!";
+                return View(vm);
+            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
@@ -234,9 +276,12 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var student = await _unitOfWork.Students.GetOneAsync(s => s.ApplicationUserId == user.Id);
             if (student == null) return Unauthorized();
 
-            // نجيب التاسك علشان نعرف الـ Deadline
             var task = await _unitOfWork.SubjectTasks.GetOneAsync(t => t.Id == vm.TaskId);
-            if (task == null) return NotFound();
+            if (task == null)
+            {
+                TempData["error-notification"] = "Task not found!";
+                return NotFound();
+            }
 
             var submission = new TaskSubmission
             {
@@ -244,13 +289,11 @@ namespace SmartUniversity.Areas.Customer.Controllers
                 StudentID = student.Id,
                 SubmissionDate = DateTime.Now,
                 SubmissionLink = vm.SubmissionLink,
-                Status = (DateTime.Now <= task.Deadline) ? SubmissionStatus.OnTime : SubmissionStatus.Late   
-
-
+                Status = (DateTime.Now <= task.Deadline) ? SubmissionStatus.OnTime : SubmissionStatus.Late
             };
 
             await _unitOfWork.TaskSubmissions.CreateAsync(submission);
-            TempData["success-notification"] = "Submission sent successfully!";
+            TempData["success-notification"] = "Submission sent successfully 📤";
 
             return RedirectToAction(nameof(Tasks), new { courseId = vm.CourseId, color = vm.Color });
         }
@@ -265,13 +308,33 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var student = await _unitOfWork.Students.GetOneAsync(s => s.ApplicationUserId == user.Id);
             if (student == null) return Unauthorized();
 
-            var submission = await _unitOfWork.TaskSubmissions.GetOneAsync(s => s.Id == submissionId && s.StudentID == student.Id);
-            if (submission == null) return NotFound();
+            var submission = await _unitOfWork.TaskSubmissions.GetOneAsync(
+                s => s.Id == submissionId && s.StudentID == student.Id
+            );
+            if (submission == null)
+            {
+                TempData["error-notification"] = "Submission not found!";
+                return NotFound();
+            }
 
+            // 🟢 امسح الفيدباك الخاصة بالطالب في نفس التاسك
+            var feedbacks = await _unitOfWork.Feedbacks.GetAsync(
+                f => f.TaskID == submission.TaskID && f.StudentID == student.Id
+            );
+
+            foreach (var fb in feedbacks.ToList())
+            {
+                await _unitOfWork.Feedbacks.DeleteAsync(fb);
+            }
+
+            // 🟢 امسح الـ Submission نفسه
             await _unitOfWork.TaskSubmissions.DeleteAsync(submission);
+
+            TempData["success-notification"] = "Submission and related feedback deleted 🗑️";
 
             return RedirectToAction(nameof(Tasks), new { courseId, color });
         }
+
 
         [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public async Task<IActionResult> Submissions(int taskId, string color)
@@ -283,12 +346,17 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var assistant = await _unitOfWork.Assistants.GetOneAsync(a => a.ApplicationUserId == user.Id);
 
             if (doctor == null && assistant == null)
+            {
+                TempData["error-notification"] = "You are not authorized to view submissions!";
                 return NotFound();
+            }
 
-            // 👇 استدعاء الميثود اللي في الريبو
             var task = await _unitOfWork.SubjectTasks.GetTaskWithSubmissionsAsync(taskId);
-
-            if (task == null) return NotFound();
+            if (task == null)
+            {
+                TempData["error-notification"] = "Task not found!";
+                return NotFound();
+            }
 
             var submissionsVM = task.TaskSubmissions.Select(s => new TaskSubmissionVM
             {
@@ -296,7 +364,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
                 TaskId = task.Id,
                 TaskTitle = task.Title,
                 StudentName = s.Student?.ApplicationUser?.FullName ?? "Unknown Student",
-               StudentId = s.StudentID,
+                StudentId = s.StudentID,
                 SubmissionDate = s.SubmissionDate,
                 Grade = s.Grade,
                 Status = s.Status,
@@ -309,6 +377,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
 
             return View(submissionsVM);
         }
+
         [HttpPost]
         [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public async Task<IActionResult> UpdateGrade(int submissionId, int taskId, int courseId, string color, double grade)
@@ -320,20 +389,24 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var assistant = await _unitOfWork.Assistants.GetOneAsync(a => a.ApplicationUserId == user.Id);
 
             if (doctor == null && assistant == null)
-                return Forbid(); // 👈 بس الدكتور/المساعد يقدر يعدل
+            {
+                TempData["error-notification"] = "You are not authorized to update grades!";
+                return Forbid();
+            }
 
             var submission = await _unitOfWork.TaskSubmissions.GetOneAsync(s => s.Id == submissionId);
-            if (submission == null) return NotFound();
+            if (submission == null)
+            {
+                TempData["error-notification"] = "Submission not found!";
+                return NotFound();
+            }
 
-            // تحديث الدرجة
-            submission.Grade =(Decimal) grade;
+            submission.Grade = (decimal)grade;
             await _unitOfWork.TaskSubmissions.UpdateAsync(submission);
+            TempData["success-notification"] = "Grade updated successfully 🎯";
 
-            // بعد الحفظ يرجع تاني للـ Submissions لنفس التسك
             return RedirectToAction("Submissions", new { taskId, color });
         }
-
-
 
         [HttpPost]
         
@@ -343,11 +416,18 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var task = await _unitOfWork.SubjectTasks.GetOneAsync(t => t.Id == taskId);
             var student = await _unitOfWork.Students.GetOneAsync(s => s.Id == studentId);
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();    
+            if (user == null)
+            {
+                TempData["error-notification"] = "User not found!";
+                return NotFound();
+            }
             var assistant = await _unitOfWork.Assistants.GetOneAsync(a => a.ApplicationUserId == user.Id);
 
             if (task == null || student == null || assistant == null)
+            {
+                TempData["error-notification"] = "Invalid data, feedback not saved!";
                 return NotFound();
+            }
 
             var feedback = new Feedback
             {
@@ -358,8 +438,9 @@ namespace SmartUniversity.Areas.Customer.Controllers
                 Comment = comment
             };
 
-            await _unitOfWork.Feedbacks.CreateAsync (feedback);
-         
+            await _unitOfWork.Feedbacks.CreateAsync(feedback);
+            TempData["success-notification"] = "Feedback added successfully 📝";
+
             return RedirectToAction("Submissions", new { taskId, courseId, color });
         }
     }
