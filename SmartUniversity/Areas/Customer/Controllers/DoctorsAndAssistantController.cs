@@ -1,6 +1,7 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
@@ -10,6 +11,7 @@ using Utility.DBInitializer;
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
     public class DoctorsAndAssistantController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManger;
@@ -30,6 +32,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles = $"{SD.Doctor}")]
         public async Task<IActionResult> DoctorCourse()
         {
             var user = await _userManger.GetUserAsync(User);
@@ -48,6 +51,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
             return View(courses);
         }
 
+        [Authorize(Roles = $"{SD.Assistant}")]
         public async Task<IActionResult> AssistantCourse()
         {
             var user = await _userManger.GetUserAsync(User);
@@ -68,6 +72,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public IActionResult AddMaterial(int courseId)
         {
             var model = new MaterialVM { UniversityCourseID = courseId };
@@ -114,6 +119,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public async Task<IActionResult> EditMaterial(int id)
         {
             var material = await _unitOfWork.Materials.GetOneAsync(m => m.Id == id);
@@ -150,6 +156,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public async Task<IActionResult> DeleteMaterial(int id)
         {
             var material = await _unitOfWork.Materials.GetOneAsync(m => m.Id == id);

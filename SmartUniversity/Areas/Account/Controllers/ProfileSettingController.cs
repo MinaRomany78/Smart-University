@@ -1,13 +1,16 @@
 ﻿using Entities.Models;
 using Entities.ViewModel;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Account.Controllers
 {
     [Area("Account")]
+    [Authorize(Roles = $"{SD.UniversityStudent},{SD.ExternalStudent},{SD.Instructor},{SD.Assistant},{SD.Doctor},{SD.Admin},{SD.SuperAdmin}")]
     public class ProfileSettingController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

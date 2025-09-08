@@ -1,6 +1,7 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,6 +13,7 @@ using Utility.DBInitializer;
 namespace SmartUniversity.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{SD.SuperAdmin},{SD.Admin}")]
     public class InstructorController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -49,18 +51,9 @@ namespace SmartUniversity.Areas.Admin.Controllers
             return View(instructors);
         }
 
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            var vm = new AdminInstructorVM
-            {
-                CoursesList = (await _unitOfWork.OptionalCourses.GetAsync()).Select(e => new SelectListItem
-                {
-                    Text = e.Name,
-                    Value = e.Id.ToString()
-                }).ToList()
-            };
-
-            return View(vm);
+            return View();
         }
 
         [HttpPost]
@@ -68,14 +61,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
         public async Task<IActionResult> Create(AdminInstructorVM vm)
         {
             if(!ModelState.IsValid)
-            {
-                vm.CoursesList = (await _unitOfWork.OptionalCourses.GetAsync()).Select(e => new SelectListItem
-                {
-                    Text = e.Name,
-                    Value = e.Id.ToString()
-                }).ToList();
-                return View(vm);
-            }
+                return View();
 
             var user = new ApplicationUser
             {
@@ -108,13 +94,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 ApplicationUserId = user.Id
             };
 
-            foreach (var courseId in vm.SelectedCourseIds)
-            {
-                var course = await _unitOfWork.OptionalCourses.GetOneAsync(e => e.Id == courseId);
-                if (course is not null)
-                    instructor.OptionalCourses.Add(course);
-            }
-
             await _unitOfWork.Instructors.CreateAsync(instructor);
             await _unitOfWork.Instructors.CommitAsync();
             TempData["success-notification"] = "Instructor created successfully.";
@@ -124,11 +103,10 @@ namespace SmartUniversity.Areas.Admin.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var instructor = _unitOfWork.Instructors.GetOneAsync(e => e.Id == id, include: new Expression<Func<Instructor, object>>[]
+            var instructor = await _unitOfWork.Instructors.GetOneAsync(e => e.Id == id, include: new Expression<Func<Instructor, object>>[]
             {
-                e => e.ApplicationUser,
-                e => e.OptionalCourses
-            }).Result;
+                e => e.ApplicationUser
+            });
 
             if (instructor is null)
                 return NotFound();
@@ -142,13 +120,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 Email = instructor.ApplicationUser.Email ?? "",
                 UserName = instructor.ApplicationUser.UserName ?? "",
                 Address = instructor.ApplicationUser.Address,
-                IsEmailConfirmed = instructor.ApplicationUser.EmailConfirmed,
-                SelectedCourseIds = instructor.OptionalCourses.Select(e => e.Id).ToList(),
-                CoursesList = (await _unitOfWork.OptionalCourses.GetAsync()).Select(e => new SelectListItem
-                {
-                    Text = e.Name,
-                    Value = e.Id.ToString()
-                }).ToList()
+                IsEmailConfirmed = instructor.ApplicationUser.EmailConfirmed
             };
 
             return View(vm);
@@ -159,14 +131,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(AdminInstructorVM vm)
         {
             if (!ModelState.IsValid)
-            {
-                vm.CoursesList = (await _unitOfWork.OptionalCourses.GetAsync()).Select(e => new SelectListItem
-                {
-                    Text = e.Name,
-                    Value = e.Id.ToString()
-                }).ToList();
                 return View(vm);
-            }
 
             var instructor = await _unitOfWork.Instructors.GetOneAsync(e => e.Id == vm.Id, include: new Expression<Func<Instructor, object>>[]
             {
@@ -184,17 +149,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             instructor.ApplicationUser.UserName = vm.UserName;
             instructor.ApplicationUser.Address = vm.Address;
             instructor.ApplicationUser.EmailConfirmed = vm.IsEmailConfirmed;
-
-            instructor.OptionalCourses.Clear();
-            if (vm.SelectedCourseIds != null && vm.SelectedCourseIds.Any())
-            {
-                foreach (var courseId in vm.SelectedCourseIds)
-                {
-                    var course = await _unitOfWork.OptionalCourses.GetOneAsync(e => e.Id == courseId);
-                    if (course is not null)
-                        instructor.OptionalCourses.Add(course);
-                }
-            }
 
             await _unitOfWork.Instructors.UpdateAsync(instructor);
             await _unitOfWork.Instructors.CommitAsync();

@@ -1,3 +1,4 @@
+@using Utility.DBInitializer
 @{
     Layout = null;
 }
@@ -88,8 +89,11 @@
                    asp-area="Admin" asp-controller="Assistant" asp-action="Index">Assistants</a>
                 <a class="nav-link @(currentController == "Instructor" ? "active" : "")"
                    asp-area="Admin" asp-controller="Instructor" asp-action="Index">Instructors</a>
-                <a class="nav-link @(currentController == "ManageAdmin" ? "active" : "")"
-                   asp-area="Admin" asp-controller="ManageAdmin" asp-action="Index">Admins</a>
+                @if (User.IsInRole(SD.SuperAdmin))
+                {
+                    <a class="nav-link @(currentController == "ManageAdmin" ? "active" : "")"
+                       asp-area="Admin" asp-controller="ManageAdmin" asp-action="Index">Admins</a>
+                }
             </div>
 
             <!-- Academics -->

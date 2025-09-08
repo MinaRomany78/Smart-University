@@ -37,6 +37,10 @@ namespace SmartUniversity.Areas.Identity.Controllers
             {
                 return RedirectToAction("index", "ExternalStudent", new { area = "Customer" });
             }
+            else if (User.IsInRole($"{SD.Admin}") || User.IsInRole($"{SD.SuperAdmin}"))
+            {
+                return RedirectToAction("index", "Home", new { area = "Admin" });
+            }
 
 
 

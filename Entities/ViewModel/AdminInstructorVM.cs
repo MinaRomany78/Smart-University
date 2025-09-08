@@ -24,7 +24,5 @@ namespace Entities.ViewModel
         public string? Address { get; set; }
         [Required]
         public string UserName { get; set; } = string.Empty;
-        public List<int> SelectedCourseIds { get; set; } = new List<int>();
-        public List<SelectListItem> CoursesList { get; set; } = new();
     }
 }

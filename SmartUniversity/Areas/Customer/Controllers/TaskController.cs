@@ -1,14 +1,17 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.Doctor},{SD.Assistant},{SD.UniversityStudent}")]
     public class TaskController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -73,6 +76,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public IActionResult CreateTask(int courseId, string color)
         {
             var vm = new TaskVM
@@ -117,6 +121,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public async Task<IActionResult> EditTask(int id, string color)
         {
             var task = await _unitOfWork.SubjectTasks.GetOneAsync(t => t.Id == id);
@@ -190,6 +195,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public async Task<IActionResult> DeleteTask(int id, int courseId, string color)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -243,6 +249,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = SD.UniversityStudent)]
         public IActionResult SubmitTask(int taskId, int courseId, string color)
         {
             var vm = new TaskSubmissionCreateVM
@@ -292,6 +299,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = SD.UniversityStudent)]
         public async Task<IActionResult> CancelSubmission(int submissionId, int courseId, string color)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -328,6 +336,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
 
+        [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public async Task<IActionResult> Submissions(int taskId, string color)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -370,6 +379,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = $"{SD.Doctor},{SD.Assistant}")]
         public async Task<IActionResult> UpdateGrade(int submissionId, int taskId, int courseId, string color, double grade)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -399,6 +409,8 @@ namespace SmartUniversity.Areas.Customer.Controllers
         }
 
         [HttpPost]
+        
+        [Authorize(Roles = SD.Assistant)]
         public async Task<IActionResult> AddFeedback(int taskId, int studentId, int courseId, string color, int rating, string comment)
         {
             var task = await _unitOfWork.SubjectTasks.GetOneAsync(t => t.Id == taskId);

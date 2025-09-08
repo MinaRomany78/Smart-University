@@ -1,13 +1,16 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.UniversityStudent},{SD.ExternalStudent}")]
     public class ExternalOCoursesController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

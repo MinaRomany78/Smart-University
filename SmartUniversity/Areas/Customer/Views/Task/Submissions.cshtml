@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<Entities.ViewModel.TaskSubmissionVM>
 @using Entities.Models
+@using Utility.DBInitializer
 @{
     ViewData["Title"] = "Submissions";
     Layout = "~/Views/Shared/_CourseLayout.cshtml";
@@ -82,14 +83,17 @@
                                     </button>
 
                                     <!-- Add Feedback -->
-                                    <button class="btn btn-sm btn-outline-dynamic rounded-pill"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#feedbackModal"
-                                            data-task-id="@submission.TaskId"
-                                            data-student-id="@submission.StudentId"
-                                            data-course-id="@submission.CourseId">
-                                        <i class="bi bi-chat-dots me-1"></i> Feedback
-                                    </button>
+                                    @if (User.IsInRole(SD.Assistant))
+                                    {
+                                        <button class="btn btn-sm btn-outline-dynamic rounded-pill"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#feedbackModal"
+                                                data-task-id="@submission.TaskId"
+                                                data-student-id="@submission.StudentId"
+                                                data-course-id="@submission.CourseId">
+                                            <i class="bi bi-chat-dots me-1"></i> Feedback
+                                        </button>   
+                                    }
                                 </div>
                             </td>
                         </tr>

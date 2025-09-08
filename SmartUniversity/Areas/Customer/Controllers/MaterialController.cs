@@ -1,12 +1,15 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("customer")]
+    [Authorize(Roles = $"{SD.Doctor},{SD.Assistant},{SD.UniversityStudent}")]
     public class MaterialController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

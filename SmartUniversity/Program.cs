@@ -30,6 +30,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(option =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+ builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddScoped<IDBInitializer, DBInitializer>();
 
 // Generic Repository

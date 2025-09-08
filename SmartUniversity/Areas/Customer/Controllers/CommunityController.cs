@@ -8,10 +8,12 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.Doctor},{SD.Assistant},{SD.UniversityStudent}")]
     public class CommunityController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
