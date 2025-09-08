@@ -2,6 +2,7 @@
 using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,9 @@ using System.Threading.Tasks;
 using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Admin.Controllers
-{ [Area("Admin")]
+{ 
+    [Area("Admin")]
+    [Authorize(Roles = $"{SD.SuperAdmin},{SD.Admin}")]
     public class UniversityStudentController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

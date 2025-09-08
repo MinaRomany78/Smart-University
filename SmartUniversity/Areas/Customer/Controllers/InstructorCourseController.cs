@@ -1,16 +1,19 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.Instructor}")]
     public class InstructorCourseController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

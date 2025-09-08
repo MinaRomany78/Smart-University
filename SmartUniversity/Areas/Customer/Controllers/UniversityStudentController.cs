@@ -2,16 +2,19 @@
 using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
 using System.Linq.Expressions;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.UniversityStudent}")]
     public class UniversityStudentController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

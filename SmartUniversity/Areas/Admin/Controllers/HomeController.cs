@@ -1,13 +1,16 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{SD.SuperAdmin},{SD.Admin}")]
     public class HomeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

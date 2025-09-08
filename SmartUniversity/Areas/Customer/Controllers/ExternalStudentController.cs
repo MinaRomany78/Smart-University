@@ -1,15 +1,18 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.ExternalStudent},{SD.UniversityStudent},{SD.Instructor}")]
     public class ExternalStudentController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -98,6 +101,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.UniversityStudent},{SD.ExternalStudent}")]
         public async Task<IActionResult> AddReview(ReviewFormVM reviewVM)
         {
             if (ModelState.IsValid)

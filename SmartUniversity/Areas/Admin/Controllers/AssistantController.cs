@@ -1,6 +1,7 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,6 +13,7 @@ using Utility.DBInitializer;
 namespace SmartUniversity.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{SD.SuperAdmin},{SD.Admin}")]
     public class AssistantController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

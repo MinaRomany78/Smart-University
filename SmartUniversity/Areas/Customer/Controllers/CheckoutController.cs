@@ -1,15 +1,18 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.UniversityStudent},{SD.ExternalStudent},{SD.Instructor}")]
     public class CheckoutController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

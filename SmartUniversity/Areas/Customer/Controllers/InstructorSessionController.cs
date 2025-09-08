@@ -1,12 +1,15 @@
 ﻿using DataAccess.Repositories.IRepositories;
 using Entities.Models;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
+using Utility.DBInitializer;
 
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = $"{SD.Instructor}")]
     public class InstructorSessionController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
