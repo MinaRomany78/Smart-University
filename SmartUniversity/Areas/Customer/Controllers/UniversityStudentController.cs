@@ -82,7 +82,10 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound();
 
-            var student = await _unitOfWork.Students.GetOneAsync(s => s.ApplicationUserId == user.Id);
+            var student = await _unitOfWork.Students.GetOneAsync(s => s.ApplicationUserId == user.Id,include: new Expression<Func<Student, object>>[]
+            {
+                s=>s.Term,
+            });
             if (student == null) return NotFound();
 
             if (SelectedCourses == null || !SelectedCourses.Any())
@@ -121,7 +124,7 @@ namespace SmartUniversity.Areas.Customer.Controllers
                     UniversityCourseID = course.Id,
                     EnrollmentDate = DateTime.Now,
                     IsPaid = false,
-                    Term = course.Term?.Name ?? "N/A",
+                    Term = student.Term.Name,
                     CreditHours = course.CreditHours
                 };
 
@@ -254,17 +257,20 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound();
 
-            var student = await _unitOfWork.Students.GetOneAsync(s => s.ApplicationUserId == user.Id);
+            var student = await _unitOfWork.Students.GetOneAsync(s => s.ApplicationUserId == user.Id, include: new Expression<Func<Student, object>>[]
+            {
+                s=>s.Term,
+            });
             if (student == null) return NotFound();
 
-            var enrollments = await _unitOfWork.Enrollments.GetEnrollmentsWithDetailsAsync(student.Id);
+            var enrollments = await _unitOfWork.Enrollments.GetEnrollmentsWithDetailsAsync(student.Id,student.Term.Name);
            
             var vm = enrollments.Select(e => new EnrollmentVM
             {
                 CourseId = e.UniversityCourseID,
                 CourseName = e.UniversityCourse.Name,
-                DoctorName = e.UniversityCourse.Doctor.ApplicationUser.FullName,
 
+                DoctorName = e.UniversityCourse.Doctor?.ApplicationUser?.FullName ?? "Unknown Doctor",
                 Assistants = e.UniversityCourse.AssistantCourses
                    .Select(ac => ac.Assistant.ApplicationUser?.FullName ?? "Unknown Assistant")
                    .Distinct() 

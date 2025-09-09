@@ -18,10 +18,23 @@ namespace SmartUniversity.Areas.Customer.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var model = new SupportTicket();
+
+            if (User.Identity!.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    model.SenderEmail = user.Email??" ";
+                    model.SenderName = user.FullName; // لو عندك عمود FullName في ApplicationUser
+                }
+            }
+
+            return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Create(SupportTicket ticket)

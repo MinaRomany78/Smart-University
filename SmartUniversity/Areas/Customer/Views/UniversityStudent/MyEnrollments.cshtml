@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Entities.ViewModel.EnrollmentVM>
 @{
     ViewData["Title"] = "My Enrollments";
-    var colors = new string[] { "#1a73e8", "#0f9d58", "#ea4335", "#9c27b0", "#009688", "#ff9800", "#5f6368" };
+    var colors = new string[] { "#1a73e8", "#0f9d58", "#ea4335", "#9c27b0", "#009688", "#ff9800" };
     int i = 0;
 }
 
@@ -19,11 +19,11 @@
                             <i class="bi bi-house-door"></i> Home
                         </a>
                     </li>
-                    <li class="nav-item">
+                    @* <li class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="bi bi-calendar-event"></i> Calendar
                         </a>
-                    </li>
+                    </li> *@
                     <li class="nav-item">
                         <a class="nav-link collapse-toggle" data-bs-toggle="collapse" href="#enrolledCourses" role="button">
                             <i class="bi bi-book"></i> Enrolled Courses
@@ -31,19 +31,26 @@
                         <ul class="collapse ps-3 list-unstyled" id="enrolledCourses">
                             @foreach (var course in Model)
                             {
+                                var color = colors[i % colors.Length];
                                 <li class="nav-item">
-                                    <a class="nav-link small" href="#">
+                                    <a class="nav-link small"
+                                      asp-action="Index"
+                                       asp-controller="Community"
+                                       asp-area="Customer"
+                                       asp-route-courseId="@course.CourseId"
+                                       asp-route-color="@color">
                                         <i class="bi bi-dot"></i> @course.CourseName
                                     </a>
                                 </li>
+                                i++;
                             }
                         </ul>
                     </li>
-                    <li class="nav-item">
+                    @* <li class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="bi bi-list-task"></i> Tasks
                         </a>
-                    </li>
+                    </li> *@
                 </ul>
             </div>
         </div>

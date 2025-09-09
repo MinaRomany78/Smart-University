@@ -64,13 +64,29 @@ namespace SmartUniversity.Areas.Admin.Controllers
             if (!ModelState.IsValid)
                 return View(externalStudentVM);
 
+            // ✅ Check UserName uniqueness
+            var existingUserName = await _userManager.FindByNameAsync(externalStudentVM.UserName);
+            if (existingUserName != null)
+            {
+                ModelState.AddModelError("UserName", "Username is already taken.");
+                return View(externalStudentVM);
+            }
+
+            // ✅ Check Email uniqueness
+            var existingEmail = await _userManager.FindByEmailAsync(externalStudentVM.Email);
+            if (existingEmail != null)
+            {
+                ModelState.AddModelError("Email", "Email is already registered.");
+                return View(externalStudentVM);
+            }
+
             var user = new ApplicationUser
             {
                 UserName = externalStudentVM.UserName,
                 Email = externalStudentVM.Email,
                 FirstName = externalStudentVM.FirstName,
                 LastName = externalStudentVM.LastName,
-                FullName = externalStudentVM.FirstName+" "+externalStudentVM.LastName,
+                FullName = externalStudentVM.FirstName + " " + externalStudentVM.LastName,
                 EmailConfirmed = externalStudentVM.EmailConfirmed
             };
 
@@ -89,6 +105,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
 
             return View(externalStudentVM);
         }
+
 
         public async Task<IActionResult> Edit(string id)
         {
@@ -111,14 +128,29 @@ namespace SmartUniversity.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit( AdminExternalStudentVM externalStudentVM)
+        public async Task<IActionResult> Edit(AdminExternalStudentVM externalStudentVM)
         {
-
             var user = await _userManager.FindByIdAsync(externalStudentVM.Id);
             if (user == null) return NotFound();
 
             if (!ModelState.IsValid)
                 return View(externalStudentVM);
+
+            // ✅ Check UserName uniqueness (exclude current user)
+            var existingUserName = await _userManager.FindByNameAsync(externalStudentVM.UserName);
+            if (existingUserName != null && existingUserName.Id != user.Id)
+            {
+                ModelState.AddModelError("UserName", "Username is already taken.");
+                return View(externalStudentVM);
+            }
+
+            // ✅ Check Email uniqueness (exclude current user)
+            var existingEmail = await _userManager.FindByEmailAsync(externalStudentVM.Email);
+            if (existingEmail != null && existingEmail.Id != user.Id)
+            {
+                ModelState.AddModelError("Email", "Email is already registered.");
+                return View(externalStudentVM);
+            }
 
             user.UserName = externalStudentVM.UserName;
             user.FirstName = externalStudentVM.FirstName;
@@ -140,6 +172,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
 
             return View(externalStudentVM);
         }
+
         public async Task<IActionResult> Delete(string id)
         {
 

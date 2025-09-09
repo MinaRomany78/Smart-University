@@ -28,7 +28,7 @@
 
                 <div class="mb-3">
                     <label asp-for="DepartmentId" class="form-label">Department</label>
-                    <select asp-for="DepartmentId" asp-items="Model.DepartMentList" class="form-select">
+                    <select asp-for="DepartmentId" asp-items="Model.DepartMentList" class="form-select" id="departmentDropdown">
                         <option value="">-- Select Department --</option>
                     </select>
                     <span asp-validation-for="DepartmentId" class="text-danger"></span>
@@ -36,7 +36,7 @@
 
                 <div class="mb-3">
                     <label asp-for="TermId" class="form-label">Term</label>
-                    <select asp-for="TermId" asp-items="Model.TermList" class="form-select">
+                    <select asp-for="TermId" class="form-select" id="termDropdown">
                         <option value="">-- Select Term --</option>
                     </select>
                     <span asp-validation-for="TermId" class="text-danger"></span>
@@ -57,4 +57,37 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            var selectedTermId = '@Model.TermId';
+            var selectedDepartmentId = $('#departmentDropdown').val();
+
+            function loadTerms(departmentId, preselectedTermId) {
+                var termDropdown = $("#termDropdown");
+                termDropdown.empty();
+                termDropdown.append('<option value="">-- Select Term --</option>');
+
+                if (departmentId) {
+                    $.getJSON('/Admin/Course/GetTermsByDepartment', { departmentId: departmentId }, function (data) {
+                        $.each(data, function (i, term) {
+                            termDropdown.append($('<option>', {
+                                value: term.id,
+                                text: term.name,
+                                selected: term.id == preselectedTermId
+                            }));
+                        });
+                    });
+                }
+            }
+
+            // عند تحميل الصفحة أول مرة (عشان الـ Edit)
+            loadTerms(selectedDepartmentId, selectedTermId);
+
+            // عند تغيير القسم
+            $("#departmentDropdown").change(function () {
+                var departmentId = $(this).val();
+                loadTerms(departmentId, null);
+            });
+        });
+    </script>
 }

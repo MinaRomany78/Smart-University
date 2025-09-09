@@ -10,7 +10,7 @@ using Utility.DBInitializer;
 namespace SmartUniversity.Areas.Customer.Controllers
 {
     [Area("Customer")]
-    [Authorize(Roles = $"{SD.UniversityStudent},{SD.ExternalStudent}")]
+    [Authorize(Roles = $"{SD.UniversityStudent},{SD.ExternalStudent},{SD.Instructor}")]
     public class ExternalOCoursesController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

@@ -11,10 +11,10 @@ namespace DataAccess.Repositories
         public EnrollmentRepository(ApplicationDbContext context) : base(context) {
             _context = context;
         }
-        public async Task<IEnumerable<Enrollment>> GetEnrollmentsWithDetailsAsync(int studentId)
+        public async Task<IEnumerable<Enrollment>> GetEnrollmentsWithDetailsAsync(int studentId,string termName)
         {
             return await _context.Enrollments
-                .Where(e => e.StudentID == studentId)
+                .Where(e => e.StudentID == studentId&& e.IsPaid==true&& e.Term==termName)
                 .Include(e => e.UniversityCourse)
                     .ThenInclude(c => c.Doctor)
                         .ThenInclude(d => d.ApplicationUser)

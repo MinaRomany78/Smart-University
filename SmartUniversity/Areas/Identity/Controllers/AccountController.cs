@@ -127,7 +127,7 @@ namespace SmartUniversity.Areas.Identity.Controllers
 
             if (result.IsLockedOut)
             {
-                ModelState.AddModelError(string.Empty, "Too Many Attempts, Account Locked");
+                TempData["error-notification"] = $"you have block till {user.LockoutEnd}";
                 return View(loginVM);
             }
 
