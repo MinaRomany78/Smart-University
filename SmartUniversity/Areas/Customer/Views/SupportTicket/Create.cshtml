@@ -48,11 +48,14 @@
             <span asp-validation-for="SenderName" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="SenderEmail" class="form-label">Email</label>
-            <input asp-for="SenderEmail" class="form-control" type="email" required />
-            <span asp-validation-for="SenderEmail" class="text-danger"></span>
-        </div>
+       <div class="mb-3">
+        <label asp-for="SenderEmail" class="form-label">Email</label>
+        <input asp-for="SenderEmail" class="form-control" type="email"
+               value="@Model.SenderEmail"
+                required />
+        <span asp-validation-for="SenderEmail" class="text-danger"></span>
+    </div>
+
 
         <div class="mb-3">
             <label asp-for="IssueDescription" class="form-label">Issue Description</label>

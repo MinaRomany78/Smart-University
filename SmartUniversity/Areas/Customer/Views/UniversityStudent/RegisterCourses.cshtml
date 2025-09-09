@@ -192,25 +192,7 @@ else
 @section Scripts {
     <script>
                $(function () {
-            // Toastr setup
-            toastr.options = {
-                "closeButton": true,
-                "progressBar": true,
-                "positionClass": "toast-bottom-right",
-                "timeOut": "4000"
-            };
-
-            // Success / Error messages
-            @if (TempData["success-notification"] != null)
-            {
-                    <text>toastr.success('@TempData["success-notification"]');</text>
-            }
-            @if (TempData["error-notification"] != null)
-            {
-                    <text>toastr.error('@TempData["error-notification"]');</text>
-            }
-
-            // ⬇️ نبدأ بعدد الساعات المسجلة قبل كده
+            
             let totalCredits = @ViewBag.AlreadyRegisteredCredits;
             $("#selectedCredits").text(totalCredits);
 

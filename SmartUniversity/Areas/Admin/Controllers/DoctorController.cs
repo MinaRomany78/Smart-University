@@ -18,12 +18,14 @@ namespace SmartUniversity.Areas.Admin.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
+
         public DoctorController(IUnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
             _userManager = userManager;
         }
+
         public async Task<IActionResult> Index(int page = 1)
         {
             var doctors = await _unitOfWork.Doctors.GetAsync(include: new Expression<Func<Doctor, object>>[]
@@ -38,7 +40,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
             var totalPages = Math.Ceiling((double)doctors.Count() / totalDoctorsInPage);
 
             if (page > totalPages && totalPages != 0)
-                return View(); ;
+                return View();
 
             doctors = doctors
                 .Skip((page - 1) * (int)totalDoctorsInPage)
@@ -47,7 +49,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             ViewBag.totalPages = totalPages;
             ViewBag.CurrentPage = page;
 
-
             return View(doctors);
         }
 
@@ -55,14 +56,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
         {
             var vm = new AdminDoctorVM
             {
-                //AssistantsList = (await _unitOfWork.Assistants.GetAsync(
-                //    include: new Expression<Func<Assistant, object>>[] { e => e.ApplicationUser }))
-                //.Select(e => new SelectListItem
-                //{
-                //    Value = e.Id.ToString(),
-                //    Text = e.ApplicationUser.FullName
-                //}).ToList(),
-
                 CoursesList = (await _unitOfWork.UniversityCourses.GetAsync())
                 .Select(e => new SelectListItem
                 {
@@ -75,10 +68,18 @@ namespace SmartUniversity.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AdminDoctorVM vm)
         {
+            // ✅ تحقق من Username و Email
+            var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
+            if (existingUserByName != null)
+                ModelState.AddModelError("UserName", "Username is already taken.");
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
+            if (existingUserByEmail != null)
+                ModelState.AddModelError("Email", "Email is already registered.");
+
             if (!ModelState.IsValid)
             {
                 vm.CoursesList = (await _unitOfWork.UniversityCourses.GetAsync())
@@ -91,7 +92,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 return View(vm);
             }
 
-            // 1- إنشاء ApplicationUser
             var user = new ApplicationUser
             {
                 FirstName = vm.FirstName,
@@ -103,30 +103,33 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(user, vm.Password!);
+            var result = await _userManager.CreateAsync(user, "Doctor123+");
 
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
 
+                vm.CoursesList = (await _unitOfWork.UniversityCourses.GetAsync())
+                    .Select(e => new SelectListItem
+                    {
+                        Value = e.Id.ToString(),
+                        Text = e.Name
+                    }).ToList();
+
                 return View(vm);
             }
 
-            // 2- إضافة في رول Doctor
             if (!await _roleManager.RoleExistsAsync(SD.Doctor))
                 await _roleManager.CreateAsync(new IdentityRole(SD.Doctor));
 
             await _userManager.AddToRoleAsync(user, SD.Doctor);
 
-            // 3- إنشاء Doctor وربطه بالـ User
             var doctor = new Doctor
             {
                 ApplicationUserId = user.Id,
-                
             };
 
-            // 4- إضافة الكورسات المختارة
             foreach (var courseId in vm.SelectedCourseIds)
             {
                 var course = await _unitOfWork.UniversityCourses.GetOneAsync(e => e.Id == courseId);
@@ -134,7 +137,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     doctor.UniversityCourses.Add(course);
             }
 
-            // 5- إضافة الـ Assistants المرتبطين بالكورسات
             foreach (var courseId in vm.SelectedCourseIds)
             {
                 var assistantCourse = await _unitOfWork.AssistantCourses.GetOneAsync(e => e.CourseId == courseId);
@@ -149,9 +151,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             }
 
             await _unitOfWork.Doctors.CreateAsync(doctor);
-            
-
-            
 
             TempData["success-notification"] = "Doctor created successfully!";
             return RedirectToAction(nameof(Index));
@@ -176,13 +175,12 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 FirstName = doctor.ApplicationUser.FirstName,
                 LastName = doctor.ApplicationUser.LastName,
                 FullName = doctor.ApplicationUser.FullName,
-                Email = doctor!.ApplicationUser.Email ?? "",
+                Email = doctor.ApplicationUser.Email ?? "",
                 IsEmailConfirmed = doctor.ApplicationUser.EmailConfirmed,
                 Address = doctor.ApplicationUser.Address,
-                UserName = doctor!.ApplicationUser.UserName ?? "",
-                
+                UserName = doctor.ApplicationUser.UserName ?? "",
                 SelectedCourseIds = doctor.UniversityCourses.Select(e => e.Id).ToList(),
-                
+
                 CoursesList = (await _unitOfWork.UniversityCourses.GetAsync())
                 .Select(e => new SelectListItem
                 {
@@ -198,6 +196,33 @@ namespace SmartUniversity.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(AdminDoctorVM vm)
         {
+            var doctor = await _unitOfWork.Doctors.GetOneAsync(e => e.Id == vm.Id,
+                include: new Expression<Func<Doctor, object>>[]
+                {
+                    e => e.ApplicationUser,
+                    e => e.UniversityCourses,
+                    e => e.DoctorAssistants
+                });
+
+            if (doctor is null)
+                return NotFound();
+
+            // ✅ تحقق من Username (لو اتغير)
+            if (doctor.ApplicationUser.UserName != vm.UserName)
+            {
+                var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
+                if (existingUserByName != null)
+                    ModelState.AddModelError("UserName", "Username is already taken.");
+            }
+
+            // ✅ تحقق من Email (لو اتغير)
+            if (doctor.ApplicationUser.Email != vm.Email)
+            {
+                var existingUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
+                if (existingUserByEmail != null)
+                    ModelState.AddModelError("Email", "Email is already registered.");
+            }
+
             if (!ModelState.IsValid)
             {
                 vm.CoursesList = (await _unitOfWork.UniversityCourses.GetAsync())
@@ -210,19 +235,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 return View(vm);
             }
 
-            // جلب الدكتور مع الـ navigation
-            var doctor = await _unitOfWork.Doctors.GetOneAsync(e => e.Id == vm.Id,
-                include: new Expression<Func<Doctor, object>>[]
-                {
-            e => e.ApplicationUser,
-            e => e.UniversityCourses,
-            e => e.DoctorAssistants
-                });
-
-            if (doctor is null)
-                return NotFound();
-
-            // تحديث بيانات المستخدم
             doctor.ApplicationUser.FirstName = vm.FirstName;
             doctor.ApplicationUser.LastName = vm.LastName;
             doctor.ApplicationUser.FullName = vm.FullName;
@@ -231,7 +243,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             doctor.ApplicationUser.UserName = vm.UserName;
             doctor.ApplicationUser.EmailConfirmed = vm.IsEmailConfirmed;
 
-            // تحديث الكورسات
             doctor.UniversityCourses.Clear();
             if (vm.SelectedCourseIds != null && vm.SelectedCourseIds.Any())
             {
@@ -243,7 +254,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 }
             }
 
-            // تحديث DoctorAssistants
             doctor.DoctorAssistants.Clear();
             if (vm.SelectedCourseIds != null && vm.SelectedCourseIds.Any())
             {
@@ -261,15 +271,12 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 }
             }
 
-            // تحديث
             await _unitOfWork.Doctors.UpdateAsync(doctor);
             await _unitOfWork.Doctors.CommitAsync();
 
             TempData["success-notification"] = "Doctor updated successfully";
-
             return RedirectToAction(nameof(Index));
         }
-
 
         public async Task<IActionResult> Delete(int id)
         {
@@ -290,11 +297,12 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 await _unitOfWork.Doctors.CommitAsync();
 
                 TempData["success-notification"] = "Doctor Data Deleted Successfully";
-
                 return RedirectToAction(nameof(Index));
             }
 
             return NotFound();
         }
+
+        
     }
 }

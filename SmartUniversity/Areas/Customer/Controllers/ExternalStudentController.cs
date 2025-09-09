@@ -80,13 +80,34 @@ namespace SmartUniversity.Areas.Customer.Controllers
             var user = await _userManager.GetUserAsync(User);
 
             bool hasPurchased = false;
+            bool isMyCourse=false;
 
             if (user is not null)
             {
-                var order = await _unitOfWork.Orders.GetOneAsync(e => e.ApplicationUserId == user.Id
+                if (User.IsInRole($"{SD.ExternalStudent}")|| User.IsInRole($"{SD.UniversityStudent}"))
+                {
+                    var order = await _unitOfWork.Orders.GetOneAsync(e => e.ApplicationUserId == user.Id
                 && e.OptionalCourseId == id);
 
-                hasPurchased = order is not null;
+                    hasPurchased = order is not null;
+                }
+                else if (User.IsInRole($"{SD.Instructor}"))
+                { 
+                    var instructor=await _unitOfWork.Instructors.GetOneAsync(e=>e.ApplicationUserId==user.Id);
+                    if (instructor is null)
+                        return NotFound();
+                    var oinstructorCourse = await _unitOfWork.OptionalCourses
+                        .GetOneAsync(e => e.Id == id && e.InstructorId == instructor.Id);
+
+                    isMyCourse = oinstructorCourse is not null;
+
+                    var order = await _unitOfWork.Orders.GetOneAsync(e => e.ApplicationUserId == user.Id
+                && e.OptionalCourseId == id);
+
+                    hasPurchased = order is not null;
+
+                }
+                   
             }
 
             return View(new OcoursesWithTopANDReviewsVM()
@@ -95,7 +116,8 @@ namespace SmartUniversity.Areas.Customer.Controllers
                 TopCourses = topCourses,
                 Reviews = reviews,
                 AverageRating = avg,
-                HasPurchased = hasPurchased
+                HasPurchased = hasPurchased,
+                IsMyCourse = isMyCourse,
             });
         }
 

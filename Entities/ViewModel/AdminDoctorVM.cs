@@ -24,11 +24,11 @@ namespace Entities.ViewModel
         public string? Address { get; set; }
         [Required]
         public string UserName { get; set; } = string.Empty;
-        [DataType(DataType.Password)]
-        public string? Password { get; set; }
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Passwords do not match.")]
-        public string? ConfirmPassword { get; set; }
+        //[DataType(DataType.Password)]
+        //public string? Password { get; set; }
+        //[DataType(DataType.Password)]
+        //[Compare("Password", ErrorMessage = "Passwords do not match.")]
+        //public string? ConfirmPassword { get; set; }
         //public List<int> SelectedAssistantIds { get; set; } = new List<int>();
         //public List<SelectListItem> AssistantsList { get; set; } = new();
         public List<int> SelectedCourseIds { get; set; } = new List<int>();

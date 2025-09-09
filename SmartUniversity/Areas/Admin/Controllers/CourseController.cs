@@ -23,7 +23,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             _unitOfWork = unitOfWork;
         }
 
-       
         public async Task<IActionResult> Index(int page = 1)
         {
             var courses = await _unitOfWork.UniversityCourses.GetAsync(
@@ -62,16 +61,13 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name })
                     .ToList(),
 
-                TermList = (await _unitOfWork.Terms.GetAsync())
-                    .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
-                    .ToList()
+                TermList = new List<SelectListItem>() // هيتعبى بالـ Ajax
             };
 
             return View(model);
         }
 
         [HttpPost]
-     
         public async Task<IActionResult> Create(AdminCourseVM courseVM)
         {
             if (!ModelState.IsValid)
@@ -80,10 +76,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name })
                     .ToList();
 
-                courseVM.TermList = (await _unitOfWork.Terms.GetAsync())
-                    .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
-                    .ToList();
-
+                courseVM.TermList = new List<SelectListItem>();
                 return View(courseVM);
             }
 
@@ -120,16 +113,13 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 DepartMentList = (await _unitOfWork.Departments.GetAsync())
                     .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name })
                     .ToList(),
-                TermList = (await _unitOfWork.Terms.GetAsync())
-                    .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
-                    .ToList()
+                TermList = new List<SelectListItem>() // هيتعبى بالـ Ajax
             };
 
             return View(model);
         }
 
         [HttpPost]
-       
         public async Task<IActionResult> Edit(AdminCourseVM courseVM)
         {
             if (!ModelState.IsValid)
@@ -138,10 +128,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name })
                     .ToList();
 
-                courseVM.TermList = (await _unitOfWork.Terms.GetAsync())
-                    .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
-                    .ToList();
-
+                courseVM.TermList = new List<SelectListItem>();
                 return View(courseVM);
             }
 
@@ -161,7 +148,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index), "Course", new { area = "Admin" });
         }
 
-    
         public async Task<IActionResult> Delete(int id)
         {
             var courseRemove = await _unitOfWork.UniversityCourses.GetOneAsync(e => e.Id == id);
@@ -173,6 +159,22 @@ namespace SmartUniversity.Areas.Admin.Controllers
 
             TempData["success-notification"] = "Course Deleted successfully!";
             return RedirectToAction(nameof(Index), "Course", new { area = "Admin" });
+        }
+
+        // ✅ API للـ AJAX
+        [HttpGet]
+        public async Task<IActionResult> GetTermsByDepartment(int departmentId)
+        {
+            var terms = await _unitOfWork.Terms.GetAsync();
+
+            // نفترض General = 1 , CS = 2 , IS = 3
+            if (departmentId == 1) // General
+                terms = terms.Where(t => t.Id <= 4);
+            else // CS أو IS
+                terms = terms.Where(t => t.Id > 4);
+
+            var termList = terms.Select(t => new { t.Id, t.Name }).ToList();
+            return Json(termList);
         }
     }
 }

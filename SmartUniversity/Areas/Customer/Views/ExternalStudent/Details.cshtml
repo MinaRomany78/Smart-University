@@ -52,6 +52,19 @@
                         </a>
                     </div>
                 }
+                else if (Model.IsMyCourse)
+                {
+                    <div class="d-flex flex-column gap-3">
+                        <span class="badge bg-success fs-6 p-2 rounded-pill">
+                            ✅ this your Course
+                        </span>
+                        <a href="@Url.Action("Details", "InstructorCourse", new { id = Model.OptionalCourse.Id, area = "Customer" })"
+                           class="btn btn-gradient flex-grow-1 fw-semibold rounded-pill shadow-sm">
+                            <i class="fas fa-book-open"></i> Control
+                        </a>
+                    </div>
+                    
+                }
                 else
                 {
                     <form asp-area="Customer" asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex flex-column gap-3">

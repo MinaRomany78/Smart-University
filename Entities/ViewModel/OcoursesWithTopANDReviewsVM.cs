@@ -14,5 +14,6 @@ namespace Entities.ViewModel
         public IEnumerable<CourseReview> Reviews { get; set; } = new List<CourseReview>();
         public double AverageRating { get; set; }
         public bool HasPurchased { get; set; }
+        public bool IsMyCourse { get; set;} 
     }
 }

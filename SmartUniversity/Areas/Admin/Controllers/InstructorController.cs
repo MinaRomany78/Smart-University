@@ -60,7 +60,15 @@ namespace SmartUniversity.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AdminInstructorVM vm)
         {
-            if(!ModelState.IsValid)
+            var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
+            if (existingUserByName != null)
+                ModelState.AddModelError("UserName", "Username is already taken.");
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
+            if (existingUserByEmail != null)
+                ModelState.AddModelError("Email", "Email is already registered.");
+
+            if (!ModelState.IsValid)
                 return View();
 
             var user = new ApplicationUser
@@ -130,6 +138,14 @@ namespace SmartUniversity.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(AdminInstructorVM vm)
         {
+            var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
+            if (existingUserByName != null)
+                ModelState.AddModelError("UserName", "Username is already taken.");
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
+            if (existingUserByEmail != null)
+                ModelState.AddModelError("Email", "Email is already registered.");
+
             if (!ModelState.IsValid)
                 return View(vm);
 

@@ -17,7 +17,7 @@
                     <!-- National ID -->
                     <div class="col-md-6 mb-3">
                         <label asp-for="NationalId" class="form-label"></label>
-                        <input asp-for="NationalId" class="form-control" />
+                        <input asp-for="NationalId" class="form-control" readonly />
                         <span asp-validation-for="NationalId" class="text-danger"></span>
                     </div>
 
@@ -38,7 +38,7 @@
                     <!-- Department -->
                     <div class="col-md-6 mb-3">
                         <label asp-for="DepartmentId" class="form-label"></label>
-                        <select asp-for="DepartmentId" class="form-select" asp-items="Model.DepartMentList">
+                        <select asp-for="DepartmentId" class="form-select" asp-items="Model.DepartMentList" id="DepartmentId">
                             <option value="">-- Select Department --</option>
                         </select>
                         <span asp-validation-for="DepartmentId" class="text-danger"></span>
@@ -47,7 +47,7 @@
                     <!-- Term -->
                     <div class="col-md-6 mb-3">
                         <label asp-for="TermId" class="form-label"></label>
-                        <select asp-for="TermId" class="form-select" asp-items="Model.TermList">
+                        <select asp-for="TermId" class="form-select" id="TermId">
                             <option value="">-- Select Term --</option>
                         </select>
                         <span asp-validation-for="TermId" class="text-danger"></span>
@@ -69,4 +69,40 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            function loadTerms(deptId, selectedTermId) {
+                var termDropdown = $("#TermId");
+                termDropdown.empty();
+                termDropdown.append($('<option>', { value: "", text: "-- Select Term --" }));
+
+                if (deptId) {
+                    $.getJSON('/Admin/UniversityStudent/GetTermsByDepartment',
+                        { departmentId: deptId },
+                        function (data) {
+                            $.each(data, function (i, term) {
+                                termDropdown.append($('<option>', {
+                                    value: term.id,
+                                    text: term.name,
+                                    selected: term.id === selectedTermId
+                                }));
+                            });
+                        });
+                }
+            }
+
+            // لما يتغير الـ Department
+            $("#DepartmentId").change(function () {
+                loadTerms($(this).val(), null);
+            });
+
+            // تحميل البيانات أول مرة لما الصفحة تفتح
+            var initialDeptId = $("#DepartmentId").val();
+            var initialTermId = '@Model.TermId';
+            if (initialDeptId) {
+                loadTerms(initialDeptId, parseInt(initialTermId));
+            }
+        });
+    </script>
 }

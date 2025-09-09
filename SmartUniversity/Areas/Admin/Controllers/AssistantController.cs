@@ -69,6 +69,14 @@ namespace SmartUniversity.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(AdminAssistantVM vm)
         {
+            var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
+            if (existingUserByName != null)
+                ModelState.AddModelError("UserName", "Username is already taken.");
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
+            if (existingUserByEmail != null)
+                ModelState.AddModelError("Email", "Email is already registered.");
+
             if (!ModelState.IsValid)
             {
                 vm.CoursesList = (await _unitOfWork.UniversityCourses.GetAsync())
@@ -129,6 +137,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+
             var assistant = await _unitOfWork.Assistants.GetOneAsync(
                 e => e.Id == id,
                 include: new Expression<Func<Assistant, object>>[]
@@ -175,6 +184,14 @@ namespace SmartUniversity.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(AdminAssistantVM vm)
         {
+            var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
+            if (existingUserByName != null)
+                ModelState.AddModelError("UserName", "Username is already taken.");
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
+            if (existingUserByEmail != null)
+                ModelState.AddModelError("Email", "Email is already registered.");
+
             if (!ModelState.IsValid)
             {
                 // ✅ لازم تظبط selected برضه عشان لو حصل validation error
