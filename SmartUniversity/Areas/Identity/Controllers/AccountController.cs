@@ -41,7 +41,9 @@ namespace SmartUniversity.Areas.Identity.Controllers
             ApplicationUser user = new()
             {
                 UserName = registerVM.UserName,
-                FullName = registerVM.FullName,
+                FirstName = registerVM.FirstName,
+                LastName = registerVM.LastName,
+                FullName = registerVM.FirstName+" "+registerVM.LastName,
 
                 Email = registerVM.Email
             };
