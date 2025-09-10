@@ -71,7 +71,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AdminDoctorVM vm)
         {
-            // ✅ تحقق من Username و Email
+            // ✅ إنشاء المستخدم والتحقق من البيانات
             var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
             if (existingUserByName != null)
                 ModelState.AddModelError("UserName", "Username is already taken.");
@@ -130,6 +130,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 ApplicationUserId = user.Id,
             };
 
+            // ✅ ربط الكورسات
             foreach (var courseId in vm.SelectedCourseIds)
             {
                 var course = await _unitOfWork.UniversityCourses.GetOneAsync(e => e.Id == courseId);
@@ -137,6 +138,9 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     doctor.UniversityCourses.Add(course);
             }
 
+            // ❌ المشكلة هنا:
+            // انت بتجيب أول Assistant مرتبط بالكورس وتضيفه للدكتور الجديد
+            // لكن الكورس ممكن يكون مرتبط بدكتور قديم، كدا هتعمل Duplicate
             foreach (var courseId in vm.SelectedCourseIds)
             {
                 var assistantCourse = await _unitOfWork.AssistantCourses.GetOneAsync(e => e.CourseId == courseId);
@@ -151,10 +155,12 @@ namespace SmartUniversity.Areas.Admin.Controllers
             }
 
             await _unitOfWork.Doctors.CreateAsync(doctor);
+            await _unitOfWork.Doctors.CommitAsync();
 
             TempData["success-notification"] = "Doctor created successfully!";
             return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<IActionResult> Edit(int id)
         {
@@ -199,15 +205,15 @@ namespace SmartUniversity.Areas.Admin.Controllers
             var doctor = await _unitOfWork.Doctors.GetOneAsync(e => e.Id == vm.Id,
                 include: new Expression<Func<Doctor, object>>[]
                 {
-                    e => e.ApplicationUser,
-                    e => e.UniversityCourses,
-                    e => e.DoctorAssistants
+            e => e.ApplicationUser,
+            e => e.UniversityCourses,
+            e => e.DoctorAssistants
                 });
 
             if (doctor is null)
                 return NotFound();
 
-            // ✅ تحقق من Username (لو اتغير)
+            // ✅ تحقق من Username و Email
             if (doctor.ApplicationUser.UserName != vm.UserName)
             {
                 var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
@@ -215,7 +221,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     ModelState.AddModelError("UserName", "Username is already taken.");
             }
 
-            // ✅ تحقق من Email (لو اتغير)
             if (doctor.ApplicationUser.Email != vm.Email)
             {
                 var existingUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
@@ -235,6 +240,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 return View(vm);
             }
 
+            // ✅ تحديث بيانات الدكتور
             doctor.ApplicationUser.FirstName = vm.FirstName;
             doctor.ApplicationUser.LastName = vm.LastName;
             doctor.ApplicationUser.FullName = vm.FullName;
@@ -243,18 +249,15 @@ namespace SmartUniversity.Areas.Admin.Controllers
             doctor.ApplicationUser.UserName = vm.UserName;
             doctor.ApplicationUser.EmailConfirmed = vm.IsEmailConfirmed;
 
-            doctor.UniversityCourses.Clear();
-            if (vm.SelectedCourseIds != null && vm.SelectedCourseIds.Any())
+            // ❌ المشكلة هنا:
+            // بتمسح كل الـ Assistants المرتبطين بالدكتور
+            var oldAssistants = await _unitOfWork.DoctorAssistants.GetAsync(e => e.DoctorId == doctor.Id);
+            foreach (var oldAssistant in oldAssistants)
             {
-                foreach (var courseId in vm.SelectedCourseIds)
-                {
-                    var course = await _unitOfWork.UniversityCourses.GetOneAsync(e => e.Id == courseId);
-                    if (course is not null)
-                        doctor.UniversityCourses.Add(course);
-                }
+                await _unitOfWork.DoctorAssistants.DeleteAsync(oldAssistant);
             }
 
-            doctor.DoctorAssistants.Clear();
+            // بعدين تضيف مساعد واحد بس (اللي جاي من AssistantCourses)
             if (vm.SelectedCourseIds != null && vm.SelectedCourseIds.Any())
             {
                 foreach (var courseId in vm.SelectedCourseIds)
@@ -262,7 +265,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     var assistantCourse = await _unitOfWork.AssistantCourses.GetOneAsync(e => e.CourseId == courseId);
                     if (assistantCourse is not null)
                     {
-                        doctor.DoctorAssistants.Add(new DoctorAssistant
+                        await _unitOfWork.DoctorAssistants.CreateAsync(new DoctorAssistant
                         {
                             DoctorId = doctor.Id,
                             AssistantId = assistantCourse.AssistantId
@@ -271,12 +274,14 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 }
             }
 
+            await _unitOfWork.AssistantCourses.CommitAsync();
             await _unitOfWork.Doctors.UpdateAsync(doctor);
             await _unitOfWork.Doctors.CommitAsync();
 
             TempData["success-notification"] = "Doctor updated successfully";
             return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<IActionResult> Delete(int id)
         {

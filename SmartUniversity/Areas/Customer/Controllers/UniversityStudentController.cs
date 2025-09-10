@@ -28,7 +28,6 @@ namespace SmartUniversity.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
-
             return View();
         }
         [HttpGet]

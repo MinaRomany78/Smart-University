@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace Entities.Models
         public string AuthorId { get; set; } = string.Empty;
         [ForeignKey(nameof(AuthorId))]
         public ApplicationUser Author { get; set; } = null!;
+        [Required(ErrorMessage = "Comment cannot be empty")]
         public string Content { get; set; } = string.Empty;
         public DateTime DatePosted { get; set; }
     }
