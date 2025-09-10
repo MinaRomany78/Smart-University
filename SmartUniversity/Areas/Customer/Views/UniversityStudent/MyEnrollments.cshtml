@@ -1,8 +1,19 @@
 ﻿@model IEnumerable<Entities.ViewModel.EnrollmentVM>
 @{
     ViewData["Title"] = "My Enrollments";
+
+    // 🎨 6 ألوان كفاية جدًا (زي Google palette)
     var colors = new string[] { "#1a73e8", "#0f9d58", "#ea4335", "#9c27b0", "#009688", "#ff9800" };
-    int i = 0;
+
+    // 📌 Dictionary يربط CourseId بلون ثابت
+    var courseColors = new Dictionary<int, string>();
+    int colorIndex = 0;
+
+    foreach (var course in Model.Select(m => m.CourseId).Distinct())
+    {
+        courseColors[course] = colors[colorIndex % colors.Length];
+        colorIndex++;
+    }
 }
 
 <link rel="stylesheet" href="~/css/enrollments.css" />
@@ -19,11 +30,8 @@
                             <i class="bi bi-house-door"></i> Home
                         </a>
                     </li>
-                    @* <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-calendar-event"></i> Calendar
-                        </a>
-                    </li> *@
+
+                    <!-- Enrolled Courses -->
                     <li class="nav-item">
                         <a class="nav-link collapse-toggle" data-bs-toggle="collapse" href="#enrolledCourses" role="button">
                             <i class="bi bi-book"></i> Enrolled Courses
@@ -31,26 +39,20 @@
                         <ul class="collapse ps-3 list-unstyled" id="enrolledCourses">
                             @foreach (var course in Model)
                             {
-                                var color = colors[i % colors.Length];
+                                var color = courseColors[course.CourseId];
                                 <li class="nav-item">
                                     <a class="nav-link small"
-                                      asp-action="Index"
+                                       asp-action="Index"
                                        asp-controller="Community"
                                        asp-area="Customer"
                                        asp-route-courseId="@course.CourseId"
                                        asp-route-color="@color">
-                                        <i class="bi bi-dot"></i> @course.CourseName
+                                        <i class="bi bi-dot" style="color:@color;"></i> @course.CourseName
                                     </a>
                                 </li>
-                                i++;
                             }
                         </ul>
                     </li>
-                    @* <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-list-task"></i> Tasks
-                        </a>
-                    </li> *@
                 </ul>
             </div>
         </div>
@@ -61,7 +63,7 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 @foreach (var course in Model)
                 {
-                    var color = colors[i % colors.Length];
+                    var color = courseColors[course.CourseId];
                     var teacherName = "Dr " + course.DoctorName;
                     var teacherInitial = teacherName.Split(' ')[1].Substring(0, 1);
 
@@ -98,11 +100,9 @@
                                    asp-route-color="@color">
                                     <i class="bi bi-box-arrow-in-right"></i> Enter
                                 </a>
-
                             </div>
                         </div>
                     </div>
-                    i++;
                 }
             </div>
         </div>

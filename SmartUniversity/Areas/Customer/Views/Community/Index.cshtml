@@ -52,7 +52,7 @@
                     <div class="flex-grow-1">
                         <div class="input-group shadow-sm rounded-pill overflow-hidden mb-2">
                             <input type="text" name="Content" class="form-control post-input"
-                             placeholder="Share something with your classmates..." required />
+                                   placeholder="Share something with your classmates..." required />
                             <button type="submit" class="btn btn-primary btn-post d-flex align-items-center">
                                 <i class="bi bi-send me-1"></i> Post
                             </button>
@@ -141,6 +141,27 @@
                                         <i class="bi bi-film fs-2 text-primary"></i>
                                     </div>
                                 }
+                                else if (extension == ".doc" || extension == ".docx")
+                                {
+                                    <div style="width:150px; height:200px; border:1px solid #ddd; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer;"
+                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-type="doc" data-file="@file.FilePath">
+                                        <i class="bi bi-file-earmark-word fs-2 text-primary"></i>
+                                    </div>
+                                }
+                                else if (extension == ".xls" || extension == ".xlsx")
+                                {
+                                    <div style="width:150px; height:200px; border:1px solid #ddd; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer;"
+                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-type="xls" data-file="@file.FilePath">
+                                        <i class="bi bi-file-earmark-excel fs-2 text-success"></i>
+                                    </div>
+                                }
+                                else if (extension == ".ppt" || extension == ".pptx")
+                                {
+                                    <div style="width:150px; height:200px; border:1px solid #ddd; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer;"
+                                         data-bs-toggle="modal" data-bs-target="#filePreviewModal" data-type="ppt" data-file="@file.FilePath">
+                                        <i class="bi bi-file-earmark-ppt fs-2 text-warning"></i>
+                                    </div>
+                                }
                                 else
                                 {
                                     <a href="@file.FilePath" target="_blank">@System.IO.Path.GetFileName(file.FilePath)</a>
@@ -148,7 +169,15 @@
                             }
                         </div>
                     }
-
+                    @if (post.Links != null && post.Links.Any())
+                    {
+                        <div class="mb-2">
+                            @foreach (var link in post.Links)
+                            {
+                                <a href="@link.Url" target="_blank">@link.Url</a>
+                            }
+                        </div>
+                    }
                     <hr />
                     <h6 class="fw-semibold text-muted mb-3">
                         Comments
@@ -198,11 +227,12 @@
                         <div class="comment-avatar">
                             <i class="bi bi-person-fill text-primary fs-6"></i>
                         </div>
-                        <input type="text" name="Content" class="form-control comment-input" placeholder="Write a comment..." />
+                        <input type="text" name="Content" class="form-control comment-input" placeholder="Write a comment..." required />
                         <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 d-flex align-items-center gap-1">
                             <i class="bi bi-send"></i> Send
                         </button>
                     </form>
+
                 </div>
             </div>
         }
@@ -286,9 +316,9 @@
                     `<video id="previewVideo" src="${fileUrl}" controls autoplay style="width:100%; height:90vh; border:none;"></video>`
                 );
             }
-            else if (fileType === "doc") {
+            else if (fileType === "doc" || fileType === "xls" || fileType === "ppt") {
                 previewIframe.style.display = "block";
-                previewIframe.src = "https://docs.google.com/gview?url=" + encodeURIComponent(fileUrl) + "&embedded=true";
+                previewIframe.src = "https://view.officeapps.live.com/op/embed.aspx?src=" + encodeURIComponent(fileUrl);
             }
         });
 

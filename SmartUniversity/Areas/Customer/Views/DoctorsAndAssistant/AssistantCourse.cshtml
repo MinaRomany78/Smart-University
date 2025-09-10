@@ -1,8 +1,23 @@
 ﻿@model IEnumerable<AssistantCourse>
 @{
     ViewData["Title"] = "My Enrollments";
-    var colors = new string[] { "#1a73e8", "#0f9d58", "#ea4335", "#9c27b0", "#009688", "#ff9800", "#5f6368" };
-    int i = 0;
+
+    // 🎨 مجموعة ألوان كبيرة
+    var colors = new string[] {
+        "#1a73e8", "#0f9d58", "#ea4335", "#9c27b0", "#009688", "#ff9800",
+        "#3f51b5", "#795548", "#e91e63", "#00bcd4", "#8bc34a", "#cddc39",
+        "#ff5722", "#607d8b", "#673ab7", "#f44336", "#2196f3", "#4caf50"
+    };
+
+    // 📌 Dictionary يربط CourseId بلون ثابت
+    var courseColors = new Dictionary<int, string>();
+    int colorIndex = 0;
+
+    foreach (var course in Model.Select(m => m.Course).Distinct())
+    {
+        courseColors[course.Id] = colors[colorIndex % colors.Length];
+        colorIndex++;
+    }
 }
 
 <link rel="stylesheet" href="~/css/enrollments.css" />
@@ -19,30 +34,28 @@
                             <i class="bi bi-house-door"></i> Home
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-calendar-event"></i> Calendar
-                        </a>
-                    </li>
+
+                    <!-- Enrolled Courses -->
                     <li class="nav-item">
                         <a class="nav-link collapse-toggle" data-bs-toggle="collapse" href="#enrolledCourses" role="button">
                             <i class="bi bi-book"></i> Enrolled Courses
                         </a>
                         <ul class="collapse ps-3 list-unstyled" id="enrolledCourses">
-                            @foreach (var course in Model)
+                            @foreach (var enrolled in Model)
                             {
+                                var color = courseColors[enrolled.Course.Id];
                                 <li class="nav-item">
-                                    <a class="nav-link small" href="#">
-                                        <i class="bi bi-dot"></i> @course.Course.Name
+                                    <a class="nav-link small"
+                                       asp-action="Index"
+                                       asp-controller="Community"
+                                       asp-area="Customer"
+                                       asp-route-courseId="@enrolled.Course.Id"
+                                       asp-route-color="@color">
+                                        <i class="bi bi-dot" style="color:@color;"></i> @enrolled.Course.Name
                                     </a>
                                 </li>
                             }
                         </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-list-task"></i> Tasks
-                        </a>
                     </li>
                 </ul>
             </div>
@@ -54,7 +67,7 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 @foreach (var course in Model)
                 {
-                    var color = colors[i % colors.Length];
+                    var color = courseColors[course.Course.Id];
                     var teacherName = "As/ " + course.Assistant.ApplicationUser.FullName;
                     var teacherInitial = teacherName.Split(' ')[1].Substring(0, 1);
 
@@ -64,7 +77,7 @@
                                 <h5 class="course-name">@course.Course.Name</h5>
                             </div>
                             <div class="classroom-card-body p-3">
-                                <!-- Doctor -->
+                                <!-- Assistant -->
                                 <div class="teacher-section">
                                     <div class="teacher-avatar" style="background:@color;">@teacherInitial</div>
                                     <div class="teacher-info">
@@ -73,13 +86,11 @@
                                     </div>
                                 </div>
 
-                                <!-- Assistants -->
+                                <!-- Department + Term -->
                                 <div class="assistant-badges">
-                                    <div class="teacher-label">Department</div>
-
+                                    <div class="teacher-label">Details</div>
                                     <span class="badge">@course.Course.Department.Name</span>
                                     <span class="badge">@course.Course.Term.Name</span>
-
                                 </div>
                             </div>
                             <div class="card-actions">
@@ -91,12 +102,9 @@
                                    asp-route-color="@color">
                                     <i class="bi bi-box-arrow-in-right"></i> Enter
                                 </a>
-
-
                             </div>
                         </div>
                     </div>
-                    i++;
                 }
             </div>
         </div>

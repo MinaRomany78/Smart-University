@@ -88,82 +88,62 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-
-                @if (User.IsInRole($"{SD.ExternalStudent}"))
-                {
-                    <!-- Links for External Student -->
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav mb-2 mb-lg-0 w-100">
+                    @* Links by role *@
+                    @if (User.IsInRole($"{SD.ExternalStudent}"))
+                    {
                         <li class="nav-item"><a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="ExternalOCourses" asp-action="Index">My Courses</a></li>
-                        
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="SupportTicket" asp-action="Create">Contact Us</a></li>
-                     
-                    </ul>
-                }
-                else if (User.IsInRole($"{SD.Instructor}"))
-                {
-                    <!-- Links for Instructor -->
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    }
+                    else if (User.IsInRole($"{SD.Instructor}"))
+                    {
                         <li class="nav-item"><a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        @* <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="InstructorCourse" asp-action="Index">My Courses</a></li> *@
-                        <ul class="navbar-nav ms-3">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span>Courses</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="InstructorCourse" asp-action="Index">My Courses</a></li>
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="ExternalOCourses" asp-action="Index">My Pay Courses</a></li>
 
-
-                                </ul>
-                            </li>
-                        </ul>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="courseDropdown" role="button" data-bs-toggle="dropdown">
+                                Courses
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="Customer" asp-controller="InstructorCourse" asp-action="Index">My Courses</a></li>
+                                <li><a class="dropdown-item" asp-area="Customer" asp-controller="ExternalOCourses" asp-action="Index">My Pay Courses</a></li>
+                            </ul>
+                        </li>
 
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="SupportTicket" asp-action="Create">Contact Us</a></li>
-                    </ul>
-                }
-                else if (User.IsInRole($"{SD.UniversityStudent}"))
-                {
-                    <!-- Links for Internal Student -->
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    }
+                    else if (User.IsInRole($"{SD.UniversityStudent}"))
+                    {
                         <li class="nav-item"><a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="UniversityStudent" asp-action="RegisterCourses">Registration Course</a></li>
-
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="UniversityStudent" asp-action="MyEnrollments">My Courses</a></li>
 
-                        <ul class="navbar-nav ms-3">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span>Optional Courses</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="ExternalStudent" asp-action="Index">Optional Courses</a></li>
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="ExternalOCourses" asp-action="Index">My Optional Courses</a></li>
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="index">Cart of My Optional Courses</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="optionalDropdown" role="button" data-bs-toggle="dropdown">
+                                Optional Courses
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="Customer" asp-controller="ExternalStudent" asp-action="Index">Optional Courses</a></li>
+                                <li><a class="dropdown-item" asp-area="Customer" asp-controller="ExternalOCourses" asp-action="Index">My Optional Courses</a></li>
+                                <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="Index">Cart of My Optional Courses</a></li>
+                            </ul>
+                        </li>
 
-                                    
-                                </ul>
-                            </li>
-                        </ul>
                         <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="SupportTicket" asp-action="Create">Contact Us</a></li>
+                    }
 
-                    </ul>
-                }
-
-
-                <!-- Profile Dropdown -->
-                <ul class="navbar-nav ms-3">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    @* Spacer pushes profile to right *@
+                    <li class="nav-item ms-lg-auto dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle fa-lg me-2"></i>
                             <span>@User.Identity.Name</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" asp-area="Account" asp-controller="ProfileSetting" asp-action="Index">Profile Settings</a></li>
+
                             @if (User.IsInRole($"{SD.ExternalStudent}") || User.IsInRole($"{SD.Instructor}"))
                             {
-                                <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="index">Cart Of Course</a></li>
+                                <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="Index">Cart Of Course</a></li>
                             }
                             else if (User.IsInRole($"{SD.UniversityStudent}"))
                             {
@@ -176,6 +156,7 @@
                     </li>
                 </ul>
             </div>
+
         </div>
     </nav>
 
