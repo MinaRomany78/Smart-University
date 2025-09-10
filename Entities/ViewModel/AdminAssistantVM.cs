@@ -24,11 +24,7 @@ namespace Entities.ViewModel
         public string? Address { get; set; }
         [Required]
         public string UserName { get; set; } = string.Empty;
-        [DataType(DataType.Password)]
-        public string? Password { get; set; }
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Passwords do not match.")]
-        public string? ConfirmPassword { get; set; }
+      
         public List<int> SelectedCourseIds { get; set; } = new();
         public List<SelectListItem> CoursesList { get; set; } = new();
 

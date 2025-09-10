@@ -71,7 +71,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AdminDoctorVM vm)
         {
-            // ✅ إنشاء المستخدم والتحقق من البيانات
             var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
             if (existingUserByName != null)
                 ModelState.AddModelError("UserName", "Username is already taken.");
@@ -104,7 +103,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, "Doctor123+");
-
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
@@ -138,19 +136,19 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     doctor.UniversityCourses.Add(course);
             }
 
-            // ❌ المشكلة هنا:
-            // انت بتجيب أول Assistant مرتبط بالكورس وتضيفه للدكتور الجديد
-            // لكن الكورس ممكن يكون مرتبط بدكتور قديم، كدا هتعمل Duplicate
+            // ✅ ربط المساعدين لكل كورس (بدون تكرار)
             foreach (var courseId in vm.SelectedCourseIds)
             {
-                var assistantCourse = await _unitOfWork.AssistantCourses.GetOneAsync(e => e.CourseId == courseId);
-                if (assistantCourse is not null)
+                var assistants = await _unitOfWork.AssistantCourses.GetAsync(e => e.CourseId == courseId);
+                foreach (var assistant in assistants)
                 {
-                    doctor.DoctorAssistants.Add(new DoctorAssistant
+                    if (!doctor.DoctorAssistants.Any(da => da.AssistantId == assistant.AssistantId))
                     {
-                        DoctorId = doctor.Id,
-                        AssistantId = assistantCourse.AssistantId
-                    });
+                        doctor.DoctorAssistants.Add(new DoctorAssistant
+                        {
+                            AssistantId = assistant.AssistantId
+                        });
+                    }
                 }
             }
 
@@ -160,7 +158,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             TempData["success-notification"] = "Doctor created successfully!";
             return RedirectToAction(nameof(Index));
         }
-
 
         public async Task<IActionResult> Edit(int id)
         {
@@ -186,12 +183,12 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 Address = doctor.ApplicationUser.Address,
                 UserName = doctor.ApplicationUser.UserName ?? "",
                 SelectedCourseIds = doctor.UniversityCourses.Select(e => e.Id).ToList(),
-
                 CoursesList = (await _unitOfWork.UniversityCourses.GetAsync())
                 .Select(e => new SelectListItem
                 {
                     Value = e.Id.ToString(),
-                    Text = e.Name
+                    Text = e.Name,
+                    Selected = doctor.UniversityCourses.Any(c => c.Id == e.Id)
                 }).ToList()
             };
 
@@ -205,9 +202,9 @@ namespace SmartUniversity.Areas.Admin.Controllers
             var doctor = await _unitOfWork.Doctors.GetOneAsync(e => e.Id == vm.Id,
                 include: new Expression<Func<Doctor, object>>[]
                 {
-            e => e.ApplicationUser,
-            e => e.UniversityCourses,
-            e => e.DoctorAssistants
+                    e => e.ApplicationUser,
+                    e => e.UniversityCourses,
+                    e => e.DoctorAssistants
                 });
 
             if (doctor is null)
@@ -234,7 +231,8 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     .Select(e => new SelectListItem
                     {
                         Value = e.Id.ToString(),
-                        Text = e.Name
+                        Text = e.Name,
+                        Selected = vm.SelectedCourseIds.Contains(e.Id)
                     }).ToList();
 
                 return View(vm);
@@ -249,39 +247,53 @@ namespace SmartUniversity.Areas.Admin.Controllers
             doctor.ApplicationUser.UserName = vm.UserName;
             doctor.ApplicationUser.EmailConfirmed = vm.IsEmailConfirmed;
 
-            // ❌ المشكلة هنا:
-            // بتمسح كل الـ Assistants المرتبطين بالدكتور
-            var oldAssistants = await _unitOfWork.DoctorAssistants.GetAsync(e => e.DoctorId == doctor.Id);
-            foreach (var oldAssistant in oldAssistants)
+            // ✅ Sync الكورسات
+            var oldCourseIds = doctor.UniversityCourses.Select(c => c.Id).ToList();
+
+            var removedCourses = doctor.UniversityCourses.Where(c => !vm.SelectedCourseIds.Contains(c.Id)).ToList();
+            foreach (var rc in removedCourses)
+                doctor.UniversityCourses.Remove(rc);
+
+            var newCourses = vm.SelectedCourseIds.Where(id => !oldCourseIds.Contains(id)).ToList();
+            foreach (var courseId in newCourses)
             {
-                await _unitOfWork.DoctorAssistants.DeleteAsync(oldAssistant);
+                var course = await _unitOfWork.UniversityCourses.GetOneAsync(c => c.Id == courseId);
+                if (course is not null)
+                    doctor.UniversityCourses.Add(course);
             }
 
-            // بعدين تضيف مساعد واحد بس (اللي جاي من AssistantCourses)
-            if (vm.SelectedCourseIds != null && vm.SelectedCourseIds.Any())
+            // ✅ Sync DoctorAssistants
+            var oldAssistants = doctor.DoctorAssistants.Select(da => da.AssistantId).ToList();
+
+            var assistantsForSelectedCourses = new List<int>();
+            foreach (var courseId in vm.SelectedCourseIds)
             {
-                foreach (var courseId in vm.SelectedCourseIds)
+                var assistants = await _unitOfWork.AssistantCourses.GetAsync(e => e.CourseId == courseId);
+                assistantsForSelectedCourses.AddRange(assistants.Select(a => a.AssistantId));
+            }
+
+            // احذف المساعدين اللي اتشالوا
+            var assistantsToRemove = doctor.DoctorAssistants.Where(da => !assistantsForSelectedCourses.Contains(da.AssistantId)).ToList();
+            foreach (var ar in assistantsToRemove)
+                await _unitOfWork.DoctorAssistants.DeleteAsync(ar);
+
+            // ضيف المساعدين الجدد
+            var assistantsToAdd = assistantsForSelectedCourses.Distinct().Where(aid => !oldAssistants.Contains(aid));
+            foreach (var newAssistantId in assistantsToAdd)
+            {
+                await _unitOfWork.DoctorAssistants.CreateAsync(new DoctorAssistant
                 {
-                    var assistantCourse = await _unitOfWork.AssistantCourses.GetOneAsync(e => e.CourseId == courseId);
-                    if (assistantCourse is not null)
-                    {
-                        await _unitOfWork.DoctorAssistants.CreateAsync(new DoctorAssistant
-                        {
-                            DoctorId = doctor.Id,
-                            AssistantId = assistantCourse.AssistantId
-                        });
-                    }
-                }
+                    DoctorId = doctor.Id,
+                    AssistantId = newAssistantId
+                });
             }
 
-            await _unitOfWork.AssistantCourses.CommitAsync();
             await _unitOfWork.Doctors.UpdateAsync(doctor);
             await _unitOfWork.Doctors.CommitAsync();
 
             TempData["success-notification"] = "Doctor updated successfully";
             return RedirectToAction(nameof(Index));
         }
-
 
         public async Task<IActionResult> Delete(int id)
         {
@@ -307,7 +319,5 @@ namespace SmartUniversity.Areas.Admin.Controllers
 
             return NotFound();
         }
-
-        
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq.Expressions;
-using System.Numerics;
 using System.Threading.Tasks;
 using Utility.DBInitializer;
 
@@ -19,18 +18,20 @@ namespace SmartUniversity.Areas.Admin.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
+
         public AssistantController(IUnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
             _userManager = userManager;
         }
+
         public async Task<IActionResult> Index(int page = 1)
         {
             var assistants = await _unitOfWork.Assistants.GetAsync(include: new Expression<Func<Assistant, object>>[]
-                {
-                    e => e.ApplicationUser,
-                });
+            {
+                e => e.ApplicationUser,
+            });
 
             if (assistants is null)
                 return NotFound();
@@ -100,7 +101,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(user, vm.Password!);
+            var result = await _userManager.CreateAsync(user, "Assistant123+");
 
             if (!result.Succeeded)
             {
@@ -120,7 +121,7 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 ApplicationUserId = user.Id
             };
 
-            // 🔹 ربط الكورسات + ربط الدكتور بتاع كل كورس
+            // 🔹 ربط الكورسات + الدكاترة
             foreach (var courseId in vm.SelectedCourseIds)
             {
                 assistant.AssistantCourses.Add(new AssistantCourse
@@ -132,15 +133,18 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     e => e.Id == courseId,
                     include: new Expression<Func<UniversityCourse, object>>[]
                     {
-                e => e.Doctor
+                        e => e.Doctor
                     });
 
                 if (doctorCourse?.Doctor != null)
                 {
-                    assistant.DoctorAssistants.Add(new DoctorAssistant
+                    if (!assistant.DoctorAssistants.Any(da => da.DoctorId == doctorCourse.Doctor.Id))
                     {
-                        DoctorId = doctorCourse.Doctor.Id
-                    });
+                        assistant.DoctorAssistants.Add(new DoctorAssistant
+                        {
+                            DoctorId = doctorCourse.Doctor.Id
+                        });
+                    }
                 }
             }
 
@@ -150,17 +154,17 @@ namespace SmartUniversity.Areas.Admin.Controllers
             TempData["success-notification"] = "Assistant created successfully.";
             return RedirectToAction(nameof(Index));
         }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-
             var assistant = await _unitOfWork.Assistants.GetOneAsync(
                 e => e.Id == id,
                 include: new Expression<Func<Assistant, object>>[]
                 {
-            e => e.ApplicationUser,
-            e => e.AssistantCourses,
-            e => e.DoctorAssistants
+                    e => e.ApplicationUser,
+                    e => e.AssistantCourses,
+                    e => e.DoctorAssistants
                 });
 
             if (assistant is null)
@@ -176,25 +180,19 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 IsEmailConfirmed = assistant.ApplicationUser.EmailConfirmed,
                 Address = assistant.ApplicationUser.Address,
                 UserName = assistant.ApplicationUser.UserName ?? "",
-
-                // ✅ الكورسات المختارة
-                SelectedCourseIds = assistant.AssistantCourses
-                                             .Select(ac => ac.CourseId)
-                                             .ToList()
+                SelectedCourseIds = assistant.AssistantCourses.Select(ac => ac.CourseId).ToList()
             };
 
-            // ✅ قايمة كل الكورسات + تظبيط الـ selected
             var allCourses = await _unitOfWork.UniversityCourses.GetAsync();
             vm.CoursesList = allCourses.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.Name,
-                Selected = vm.SelectedCourseIds.Contains(c.Id)   // <<< هنا المهم
+                Selected = vm.SelectedCourseIds.Contains(c.Id)
             }).ToList();
 
             return View(vm);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -204,9 +202,9 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 e => e.Id == vm.Id,
                 include: new Expression<Func<Assistant, object>>[]
                 {
-            e => e.ApplicationUser,
-            e => e.AssistantCourses,
-            e => e.DoctorAssistants
+                    e => e.ApplicationUser,
+                    e => e.AssistantCourses,
+                    e => e.DoctorAssistants
                 });
 
             if (assistant is null)
@@ -214,15 +212,11 @@ namespace SmartUniversity.Areas.Admin.Controllers
 
             var existingUserByName = await _userManager.FindByNameAsync(vm.UserName);
             if (existingUserByName != null && existingUserByName.Id != assistant.ApplicationUserId)
-            {
                 ModelState.AddModelError("UserName", "Username is already taken.");
-            }
 
             var existingUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
             if (existingUserByEmail != null && existingUserByEmail.Id != assistant.ApplicationUserId)
-            {
                 ModelState.AddModelError("Email", "Email is already registered.");
-            }
 
             if (!ModelState.IsValid)
             {
@@ -246,20 +240,15 @@ namespace SmartUniversity.Areas.Admin.Controllers
             assistant.ApplicationUser.UserName = vm.UserName;
             assistant.ApplicationUser.EmailConfirmed = vm.IsEmailConfirmed;
 
-            // ✅ امسح الكورسات القديمة
-            foreach (var old in assistant.AssistantCourses.ToList())
-            {
+            // ✅ Sync الكورسات
+            var oldCourseIds = assistant.AssistantCourses.Select(ac => ac.CourseId).ToList();
+
+            var toRemove = assistant.AssistantCourses.Where(ac => !vm.SelectedCourseIds.Contains(ac.CourseId)).ToList();
+            foreach (var old in toRemove)
                 await _unitOfWork.AssistantCourses.DeleteAsync(old);
-            }
 
-            // ✅ امسح DoctorAssistants القديم
-            foreach (var old in assistant.DoctorAssistants.ToList())
-            {
-                await _unitOfWork.DoctorAssistants.DeleteAsync(old);
-            }
-
-            // ✅ ضيف الجديد
-            foreach (var courseId in vm.SelectedCourseIds)
+            var toAdd = vm.SelectedCourseIds.Where(id => !oldCourseIds.Contains(id)).ToList();
+            foreach (var courseId in toAdd)
             {
                 assistant.AssistantCourses.Add(new AssistantCourse
                 {
@@ -271,16 +260,19 @@ namespace SmartUniversity.Areas.Admin.Controllers
                     e => e.Id == courseId,
                     include: new Expression<Func<UniversityCourse, object>>[]
                     {
-                e => e.Doctor
+                        e => e.Doctor
                     });
 
                 if (doctorCourse?.Doctor != null)
                 {
-                    assistant.DoctorAssistants.Add(new DoctorAssistant
+                    if (!assistant.DoctorAssistants.Any(da => da.DoctorId == doctorCourse.Doctor.Id))
                     {
-                        DoctorId = doctorCourse.Doctor.Id,
-                        AssistantId = assistant.Id
-                    });
+                        assistant.DoctorAssistants.Add(new DoctorAssistant
+                        {
+                            DoctorId = doctorCourse.Doctor.Id,
+                            AssistantId = assistant.Id
+                        });
+                    }
                 }
             }
 
@@ -290,8 +282,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
             TempData["success-notification"] = "Assistant updated successfully";
             return RedirectToAction(nameof(Index));
         }
-
-
 
         public async Task<IActionResult> Delete(int id)
         {
@@ -312,7 +302,6 @@ namespace SmartUniversity.Areas.Admin.Controllers
                 await _unitOfWork.Assistants.CommitAsync();
 
                 TempData["success-notification"] = "Assistant Data Deleted Successfully";
-
                 return RedirectToAction(nameof(Index));
             }
 
