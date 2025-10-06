@@ -34,6 +34,14 @@ namespace SmartUniversity.Areas.Identity.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM registerVM)
         {
+            var existingUserByName = await _userManager.FindByNameAsync(registerVM.UserName);
+            if (existingUserByName != null)
+                ModelState.AddModelError("UserName", "Username is already taken.");
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(registerVM.Email);
+            if (existingUserByEmail != null)
+                ModelState.AddModelError("Email", "Email is already registered.");
+
             if (!ModelState.IsValid)
             {
                 return View(registerVM);
